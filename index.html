@@ -47,6 +47,22 @@ footer{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 12px c
 @media (max-height:480px){header{padding:2px 8px}header .ttl small{display:none}select,button{padding:2px 7px}footer{padding-top:3px;padding-bottom:calc(3px + env(safe-area-inset-bottom))}.nav{padding:2px 12px}}
 @media (max-width:600px){header .ttl small{display:none}header .ttl .full{display:none}#count{min-width:84px;font-size:13px}footer{gap:6px;padding-left:8px;padding-right:8px}.nav{padding:6px 11px}#toc{max-width:52vw}}
 
+.mhot{position:absolute;z-index:2;cursor:help;border-radius:2px;transition:background .15s,outline-color .15s;outline:2px solid transparent}
+.mhot.on{background:rgba(122,47,192,.16);outline-color:#7a2fc0}
+.mhot.g.on{background:rgba(31,138,46,.16);outline-color:#1f8a2e}
+.mhot.rm::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:#7a2fc0;box-shadow:0 0 0 2px #fff,0 1px 3px rgba(0,0,0,.4)}
+#memo{position:fixed;z-index:40;display:none;background:#fffdf8;color:#1d1d1d;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.5);padding:9px 12px 11px 12px;border-left:5px solid #7a2fc0;max-height:62vh;overflow:auto;-webkit-user-select:text;user-select:text;-webkit-overflow-scrolling:touch}
+#memo .mh{font:700 10.5px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:#7a2fc0;margin:0 18px 5px 0}
+#memo .mt{font:14px/1.45 Georgia,"Times New Roman",serif;white-space:pre-wrap}
+#memo .mx{position:absolute;top:3px;right:4px;border:0;background:none;color:#777;font-size:19px;line-height:1;padding:3px 6px;cursor:pointer}
+#memo.g{border-left-color:#1f8a2e}#memo.g .mh{color:#1f8a2e}
+#memo.new{border-left-color:#3d0f6b}#memo.new .mh{color:#3d0f6b}
+#memo.lost{border-left-color:#7a2fc0;box-shadow:inset 0 -4px 0 #1f8a2e,0 10px 30px rgba(0,0,0,.5)}
+#memo.side::before{content:"";position:absolute;top:14px;width:0;height:0;border:7px solid transparent}
+#memo.side.toL::before{right:-14px;border-left-color:#fffdf8}
+#memo.side.toR::before{left:-19px;border-right-color:#7a2fc0}
+#memo.side.g.toR::before{border-right-color:#1f8a2e}
+
 #lock{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:#1d1e21;padding:20px}
 #lock form{width:100%;max-width:380px;background:#2b2d31;border:1px solid #3a3c41;border-radius:14px;padding:26px 24px;box-shadow:0 20px 50px rgba(0,0,0,.5);-webkit-user-select:text;user-select:text}
 #lock h1{margin:0 0 4px;font-size:20px;letter-spacing:.02em}
@@ -64,7 +80,7 @@ footer{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 12px c
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 8, 2026 (v16 – changes highlighted). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 8, 2026 (v17 – changes highlighted). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -74,21 +90,22 @@ footer{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 12px c
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v16 (B&amp;W, 10.5 pt) · Oct 8, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v17 (B&amp;W, 10.5 pt) · Oct 8, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
 </header>
+<div id="memo" role="dialog" aria-live="polite"><button class="mx" aria-label="Close">&times;</button><div class="mh"></div><div class="mt"></div></div>
 <div id="stage"><div id="book"></div><div id="hint">Swipe, use ← → keys, or click a page edge to turn</div></div>
 <footer>
   <button class="nav" id="prev" aria-label="Previous">&#x2039;</button>
-  <input type="range" id="slider" min="0" max="215" value="0" aria-label="Jump to page">
+  <input type="range" id="slider" min="0" max="219" value="0" aria-label="Jump to page">
   <button class="nav" id="next" aria-label="Next">&#x203A;</button>
   <div id="count"></div>
 </footer>
 </div>
-<script>const HOT = [[1, 0.1136, 0.1324, 10], [1, 0.1325, 0.1513, 10], [1, 0.1515, 0.1703, 13], [1, 0.1704, 0.1892, 18], [1, 0.1894, 0.2082, 27], [1, 0.2083, 0.2271, 28], [1, 0.2273, 0.2461, 35], [1, 0.2462, 0.265, 39], [1, 0.2652, 0.284, 42], [1, 0.2842, 0.3029, 47], [1, 0.3031, 0.3219, 48], [1, 0.3221, 0.3408, 50], [1, 0.341, 0.3598, 52], [1, 0.36, 0.3788, 54], [1, 0.3789, 0.3977, 57], [1, 0.3979, 0.4167, 57], [1, 0.4168, 0.4356, 66], [1, 0.4358, 0.4546, 66], [1, 0.4547, 0.4735, 68], [1, 0.4737, 0.4925, 81], [1, 0.4926, 0.5114, 88], [1, 0.5116, 0.5304, 95], [1, 0.5306, 0.5493, 96], [1, 0.5495, 0.5683, 98], [1, 0.5685, 0.5873, 100], [1, 0.5874, 0.6062, 103], [1, 0.6064, 0.6252, 112], [1, 0.6253, 0.6441, 114], [1, 0.6443, 0.6631, 126], [1, 0.6632, 0.682, 128], [1, 0.6822, 0.701, 130], [1, 0.7011, 0.7199, 130], [1, 0.7201, 0.7389, 131], [1, 0.7391, 0.7578, 136], [1, 0.758, 0.7768, 139], [1, 0.777, 0.7958, 148], [1, 0.7959, 0.8147, 149], [1, 0.8149, 0.8337, 150], [1, 0.8338, 0.8526, 169], [1, 0.8528, 0.8716, 170], [1, 0.8717, 0.8905, 174], [1, 0.8907, 0.9095, 177], [1, 0.9096, 0.9284, 180], [1, 0.9286, 0.9474, 181], [1, 0.9475, 0.9663, 187], [2, 0.0711, 0.0899, 189], [2, 0.09, 0.1088, 190], [2, 0.109, 0.1278, 201], [2, 0.1279, 0.1467, 202], [2, 0.1469, 0.1657, 202], [2, 0.1658, 0.1846, 205], [2, 0.1848, 0.2036, 206], [2, 0.2038, 0.2225, 212], [2, 0.2227, 0.2415, 213], [2, 0.2417, 0.2605, 215]];
-function startBook(P, TOC){
+<script>const HOT = [[1, 0.1136, 0.1324, 7], [1, 0.1301, 0.1489, 10], [1, 0.1466, 0.1654, 10], [1, 0.1631, 0.1819, 10], [1, 0.1796, 0.1984, 10], [1, 0.1961, 0.2149, 13], [1, 0.2127, 0.2315, 13], [1, 0.2292, 0.248, 18], [1, 0.2457, 0.2645, 25], [1, 0.2622, 0.281, 27], [1, 0.2787, 0.2975, 28], [1, 0.2953, 0.314, 30], [1, 0.3118, 0.3306, 35], [1, 0.3283, 0.3471, 35], [1, 0.3448, 0.3636, 39], [1, 0.3613, 0.3801, 39], [1, 0.3778, 0.3966, 42], [1, 0.3944, 0.4132, 44], [1, 0.4109, 0.4297, 45], [1, 0.4274, 0.4462, 46], [1, 0.4439, 0.4627, 47], [1, 0.4604, 0.4792, 47], [1, 0.4769, 0.4957, 48], [1, 0.4935, 0.5123, 50], [1, 0.51, 0.5288, 52], [1, 0.5265, 0.5453, 52], [1, 0.543, 0.5618, 52], [1, 0.5595, 0.5783, 52], [1, 0.5761, 0.5948, 53], [1, 0.5926, 0.6114, 57], [1, 0.6091, 0.6279, 57], [1, 0.6256, 0.6444, 57], [1, 0.6421, 0.6609, 59], [1, 0.6586, 0.6774, 61], [1, 0.6752, 0.6939, 66], [1, 0.6917, 0.7105, 66], [1, 0.7082, 0.727, 68], [1, 0.7247, 0.7435, 81], [1, 0.7412, 0.76, 88], [1, 0.7577, 0.7765, 95], [1, 0.7743, 0.7931, 95], [1, 0.7908, 0.8096, 96], [1, 0.8073, 0.8261, 96], [1, 0.8238, 0.8426, 98], [1, 0.8403, 0.8591, 98], [1, 0.8568, 0.8756, 98], [1, 0.8734, 0.8922, 99], [1, 0.8899, 0.9087, 100], [1, 0.9064, 0.9252, 100], [1, 0.9229, 0.9417, 100], [1, 0.9394, 0.9582, 100], [2, 0.0711, 0.0899, 103], [2, 0.0876, 0.1064, 112], [2, 0.1041, 0.1229, 114], [2, 0.1206, 0.1394, 126], [2, 0.1371, 0.1559, 128], [2, 0.1537, 0.1725, 130], [2, 0.1702, 0.189, 130], [2, 0.1867, 0.2055, 130], [2, 0.2032, 0.222, 130], [2, 0.2197, 0.2385, 131], [2, 0.2363, 0.255, 136], [2, 0.2528, 0.2716, 139], [2, 0.2693, 0.2881, 148], [2, 0.2858, 0.3046, 149], [2, 0.3023, 0.3211, 150], [2, 0.3188, 0.3376, 154], [2, 0.3354, 0.3541, 159], [2, 0.3519, 0.3707, 167], [2, 0.3684, 0.3872, 170], [2, 0.3849, 0.4037, 170], [2, 0.4014, 0.4202, 173], [2, 0.4179, 0.4367, 173], [2, 0.4345, 0.4533, 177], [2, 0.451, 0.4698, 180], [2, 0.4675, 0.4863, 181], [2, 0.484, 0.5028, 181], [2, 0.5005, 0.5193, 187], [2, 0.5171, 0.5358, 189], [2, 0.5336, 0.5524, 190], [2, 0.5501, 0.5689, 201], [2, 0.5666, 0.5854, 202], [2, 0.5831, 0.6019, 202], [2, 0.5996, 0.6184, 205], [2, 0.6162, 0.6349, 205], [2, 0.6327, 0.6515, 206], [2, 0.6492, 0.668, 208], [2, 0.6657, 0.6845, 212], [2, 0.6822, 0.701, 213], [2, 0.6987, 0.7175, 213], [2, 0.7153, 0.7341, 215], [2, 0.7318, 0.7506, 215]];
+function startBook(P, TOC, MEMO){
 const N = P.length, LAST = N - 1, NINT = N - 4;            // real pages: 0 front cover, 1..252 interior, 253 back cover
 const AR = 396 / 612;                                     // page aspect (5.5 x 8.5 in)
 const SLOTS = N + 2;                                      // spread slots: 0 front, 1 inside front, 2..253 interior, 254 inside back, 255 back
@@ -115,12 +132,13 @@ function pageEl(slot, cls){
   const r = realOf(slot);
   if (r === null || r === undefined) d.classList.add('none');
   else if (r === 'blank') d.classList.add('blank');
-  else { const im = document.createElement('img'); im.alt = label(r); im.draggable = false; im.src = src(r); d.appendChild(im); d.dataset.r = r; }
+  else { const im = document.createElement('img'); im.alt = label(r); im.draggable = false; im.src = src(r); d.appendChild(im); d.dataset.r = r; addHot(d, r); }
   return d;
 }
 function present(slot){ const r = realOf(slot); return r !== null && r !== undefined; }
 
 function layout(){
+  if (typeof hideMemo === 'function') hideMemo();
   const sw = stage.clientWidth, sh = stage.clientHeight;
   spreadMode = (window.innerWidth > window.innerHeight) && window.innerWidth >= 560;
   const pad = spreadMode ? 28 : 14;
@@ -181,6 +199,7 @@ const atStart = () => spreadMode ? spreadOf(cur) === 0 : cur === 0;
 const atEnd = () => spreadMode ? spreadOf(cur) === NSPREAD - 1 : cur === LAST;
 
 function goTo(r, anim){
+  hideMemo();
   r = Math.max(0, Math.min(LAST, r | 0));
   if (busy) { pending = [r, anim]; return; }
   if (spreadMode) {
@@ -245,6 +264,54 @@ function slide(from, to){
   cur = to; updateUI();
 }
 
+
+// ---- t88u memos: hover (desktop) / tap (iPad) on a purple or green highlight shows what it replaced ----
+const MBY = {}; MEMO.forEach((m, i) => m.rects.forEach(q => (MBY[q[0]] = MBY[q[0]] || []).push([i, q])));
+const memoEl = document.getElementById('memo'); let pinned = null;
+function addHot(d, r){
+  (MBY[r] || []).forEach(([i, q]) => {
+    const m = MEMO[i], e = document.createElement('div'); e.className = 'mhot ' + m.k; e.dataset.m = i;
+    let [, x0, y0, x1, y1] = q;
+    if (m.k !== 'rm' && x1 - x0 < 0.015) { const cx = (x0 + x1) / 2; x0 = cx - 0.013; x1 = cx + 0.013; y0 -= 0.004; y1 += 0.004; }   // trim tick: bigger tap target
+    if (m.k === 'rm') { const cx = (x0 + x1) / 2 + 0.006, cy = (y0 + y1) / 2; x0 = cx - 0.022; x1 = cx + 0.022; y0 = cy - 0.016; y1 = cy + 0.016; }
+    e.style.left = (x0 * 100) + '%'; e.style.top = (y0 * 100) + '%'; e.style.width = ((x1 - x0) * 100) + '%'; e.style.height = ((y1 - y0) * 100) + '%';
+    e.addEventListener('mouseenter', () => { if (pinned === null) showMemo(i, e); });
+    e.addEventListener('mouseleave', () => { if (pinned === null) hideMemo(); });
+    d.appendChild(e);
+  });
+}
+function hideMemo(){ pinned = null; memoEl.style.display = 'none'; document.querySelectorAll('.mhot.on').forEach(x => x.classList.remove('on')); }
+function showMemo(i, el, pin){
+  hideMemo(); const m = MEMO[i]; if (pin) pinned = i;
+  const pg = el.closest('.page'); pg.querySelectorAll('.mhot[data-m="' + i + '"]').forEach(x => x.classList.add('on'));
+  memoEl.className = m.k === 'pur' || m.k === 'rm' ? 'p' : m.k;
+  memoEl.querySelector('.mh').textContent = m.h || 'Was:';
+  memoEl.querySelector('.mt').textContent = m.t || ''; memoEl.querySelector('.mt').style.display = m.t ? '' : 'none';
+  const sr = stage.getBoundingClientRect(), pr = pg.getBoundingClientRect();
+  const hs = [...pg.querySelectorAll('.mhot[data-m="' + i + '"]')].map(x => x.getBoundingClientRect());
+  const et = Math.min(...hs.map(b => b.top)), eb = Math.max(...hs.map(b => b.bottom)), el0 = Math.min(...hs.map(b => b.left)), er1 = Math.max(...hs.map(b => b.right));
+  const isLeft = ((+pg.dataset.r) - 2) % 2 === 0;
+  const space = isLeft ? pr.left - sr.left : sr.right - pr.right;
+  memoEl.style.visibility = 'hidden'; memoEl.style.display = 'block'; memoEl.style.maxHeight = '';
+  if (space >= 170) {                                   // margin note beside the page (left page -> left margin, right page -> right margin)
+    const w = Math.min(330, space - 22); memoEl.style.width = w + 'px'; memoEl.classList.add('side', isLeft ? 'toL' : 'toR');
+    memoEl.style.maxHeight = (sr.height - 16) + 'px';
+    const h = memoEl.offsetHeight;
+    memoEl.style.left = (isLeft ? pr.left - 14 - w : pr.right + 14) + 'px';
+    memoEl.style.top = Math.max(sr.top + 8, Math.min(et - 8, sr.bottom - h - 8)) + 'px';
+  } else {                                              // no room in the margin: floating side card next to the highlight
+    const w = Math.min(360, sr.width - 24); memoEl.style.width = w + 'px';
+    const below = sr.bottom - eb - 10, above = et - sr.top - 10;
+    memoEl.style.maxHeight = Math.max(120, Math.max(below, above) - 8) + 'px';
+    const h = memoEl.offsetHeight;
+    memoEl.style.left = Math.max(sr.left + 12, Math.min((el0 + er1) / 2 - w / 2, sr.right - w - 12)) + 'px';
+    memoEl.style.top = (below >= h || below >= above ? eb + 8 : et - h - 8) + 'px';
+  }
+  memoEl.style.visibility = '';
+}
+memoEl.querySelector('.mx').addEventListener('click', e => { e.stopPropagation(); hideMemo(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') hideMemo(); });
+
 function pflip(from, to){
   busy = true;
   const fwd = to > from; book.innerHTML = '';
@@ -294,6 +361,9 @@ stage.addEventListener('pointerdown', e => { if (e.button > 0) return; px = e.cl
 stage.addEventListener('pointerup', e => {
   if (px === null) return;
   const dx = e.clientX - px, dy = e.clientY - py; px = null;
+  if (Math.abs(dx) < 8 && Math.abs(dy) < 8) { const mh = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('mhot'));
+    if (mh) { const i = +mh.dataset.m; if (pinned === i) hideMemo(); else showMemo(i, mh, true); return; }
+    if (pinned !== null || memoEl.style.display === 'block') { hideMemo(); return; } }
   if (Math.abs(dx) < 8 && Math.abs(dy) < 8 && (() => { const el = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('page') && x.dataset.r); window.__hotEl = el; return !!el; })()) { const pe = window.__hotEl, rr = +pe.dataset.r, b = pe.getBoundingClientRect(), fy = (e.clientY - b.top) / b.height;
     const h = HOT.find(x => x[0] === rr && fy >= x[1] && fy <= x[2]); if (h) { goTo(h[3], false); return; } }
   if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) { dx < 0 ? next() : prev(); return; }
@@ -308,14 +378,15 @@ let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTime
 document.addEventListener('fullscreenchange', layout);
 const m = /p=(\d+)/.exec(location.hash); if (m) cur = Math.max(0, Math.min(LAST, +m[1]));
 layout();
-if (matchMedia('(pointer:coarse)').matches) document.getElementById('hint').textContent = 'Swipe or tap a page edge to turn';
+if (matchMedia('(pointer:coarse)').matches) document.getElementById('hint').textContent = 'Swipe or tap a page edge to turn · tap purple/green text to see what it replaced';
+else document.getElementById('hint').textContent = 'Arrow keys or click a page edge to turn · hover purple/green text to see what it replaced';
 setTimeout(() => { document.getElementById('hint').style.opacity = 0; }, 3500);
 window.__flip = { goTo, next, prev, state: () => ({ cur, spreadMode, W, H, busy }) };
 }
 </script>
 <script>
 (function(){
-const CFG = {"id": "b38a46eb953c", "bin": "book.b38a46eb953c.bin", "size": 19236892, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "bCnTf7f9fr2uskGf", "check": "pCKN2vb1W4Z8+WZyJ6xuybxJ86yShw=="};
+const CFG = {"id": "7a2cb22b600a", "bin": "book.7a2cb22b600a.bin", "size": 17765908, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "oZ6sVh4/WKO984uI", "check": "9JXh+nbUOXwG3eJJOd4gv1dj/m8kaA=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
@@ -369,7 +440,7 @@ async function openBook(key){
   const urls = hdr.offs.map(([o, n]) => URL.createObjectURL(new Blob([plain.subarray(base + o, base + o + n)], { type: 'image/jpeg' })));
   window.__decryptMs = Math.round(performance.now() - t0);
   $('lock').remove();
-  startBook(urls, hdr.toc);
+  startBook(urls, hdr.toc, hdr.memo || []);
 }
 async function unlock(pw, remember){
   msg('Checking password…');
