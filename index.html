@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="googlebot" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="GYS Preview">
+<meta name="theme-color" content="#1d1e21">
+<meta name="format-detection" content="telephone=no">
+<title>Private preview</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#2b2d31;color:#eee;font:14px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+#app{position:fixed;inset:0;display:flex;flex-direction:column}
+header{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:6px 12px;background:#1d1e21;border-bottom:1px solid #3a3c41}
+header .ttl{flex:1 1 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;letter-spacing:.02em}
+header .ttl .short{display:none}
+@media (max-width:600px){header .ttl .short{display:inline}}
+header .ttl small{font-weight:400;color:#a9abb0;margin-left:6px}
+select,button{font:inherit;color:#eee;background:#3a3c41;border:1px solid #4b4e55;border-radius:6px;padding:5px 9px;cursor:pointer}
+button:hover,select:hover{background:#474a50}
+button:disabled{opacity:.35;cursor:default}
+#toc{max-width:46vw}
+#stage{flex:1 1 auto;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:pan-y pinch-zoom}
+#book{position:relative;transition:transform .45s ease}
+.half{position:absolute;top:0;height:100%}
+.page{position:absolute;inset:0;background:#fff;overflow:hidden}
+.page img{display:block;width:100%;height:100%;pointer-events:none;-webkit-user-drag:none}
+.page.none{background:transparent}
+.page.blank{background:#fbfaf7}
+.book-shadow{position:absolute;top:0;height:100%;box-shadow:0 10px 30px rgba(0,0,0,.55);pointer-events:none}
+.spine-l::after,.spine-r::after{content:"";position:absolute;top:0;bottom:0;width:7%;pointer-events:none}
+.spine-l::after{right:0;background:linear-gradient(to left,rgba(0,0,0,.18),rgba(0,0,0,0))}
+.spine-r::after{left:0;background:linear-gradient(to right,rgba(0,0,0,.18),rgba(0,0,0,0))}
+.leaf{position:absolute;top:0;height:100%;transform-style:preserve-3d;z-index:5;will-change:transform}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fff;overflow:hidden}
+.face.back{transform:rotateY(180deg)}
+.face .shade{position:absolute;inset:0;pointer-events:none;opacity:0}
+.single .page{box-shadow:0 10px 30px rgba(0,0,0,.55)}
+footer{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:#1d1e21;border-top:1px solid #3a3c41}
+#slider{flex:1 1 auto;accent-color:#d4a24c;min-width:60px}
+#count{min-width:118px;text-align:center;font-variant-numeric:tabular-nums;color:#ddd}
+.nav{font-size:18px;line-height:1;padding:6px 14px}
+#hint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);padding:6px 12px;border-radius:14px;font-size:12px;color:#ddd;transition:opacity 1s;pointer-events:none;white-space:nowrap}
+@media (max-height:480px){header{padding:2px 8px}header .ttl small{display:none}select,button{padding:2px 7px}footer{padding-top:3px;padding-bottom:calc(3px + env(safe-area-inset-bottom))}.nav{padding:2px 12px}}
+@media (max-width:600px){header .ttl small{display:none}header .ttl .full{display:none}#count{min-width:84px;font-size:13px}footer{gap:6px;padding-left:8px;padding-right:8px}.nav{padding:6px 11px}#toc{max-width:52vw}}
+
+#lock{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:#1d1e21;padding:20px}
+#lock form{width:100%;max-width:380px;background:#2b2d31;border:1px solid #3a3c41;border-radius:14px;padding:26px 24px;box-shadow:0 20px 50px rgba(0,0,0,.5);-webkit-user-select:text;user-select:text}
+#lock h1{margin:0 0 4px;font-size:20px;letter-spacing:.02em}
+#lock h1 span{color:#d4a24c}
+#lock p{margin:0 0 18px;color:#a9abb0;font-size:13px}
+#lock input[type=password]{width:100%;font:16px/1.2 inherit;padding:11px 12px;border-radius:8px;border:1px solid #4b4e55;background:#1d1e21;color:#fff;margin-bottom:12px}
+#lock label{display:flex;align-items:center;gap:8px;color:#ccc;font-size:13px;margin-bottom:16px}
+#lock button{width:100%;padding:11px;font-size:16px;font-weight:600;background:#d4a24c;color:#111;border:0;border-radius:8px}
+#lock button:disabled{opacity:.6}
+#msg{min-height:20px;margin-top:12px;font-size:13px;color:#ddd;text-align:center}
+#msg.err{color:#ff8a80}
+#bar{height:4px;background:#3a3c41;border-radius:2px;margin-top:8px;overflow:hidden;display:none}
+#bar i{display:block;height:100%;width:0;background:#d4a24c;transition:width .2s}
+</style></head>
+<body>
+<div id="lock"><form id="lockform" autocomplete="on">
+  <h1>Private <span>Preview</span></h1>
+  <p>Private flipbook preview · Oct 7, 2026 (v15 – changes highlighted). Enter the password to open.</p>
+  <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
+  <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+  <label><input type="checkbox" id="remember" checked> Remember on this device</label>
+  <button type="submit" id="go">Open</button>
+  <div id="bar"><i></i></div>
+  <div id="msg" role="status"></div>
+</form></div>
+<div id="app">
+<header>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v15 (B&amp;W, 10.5 pt) · Oct 7, 2026 · screen only, not for print</small></div>
+  <select id="toc" aria-label="Table of contents"></select>
+  <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
+  <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
+</header>
+<div id="stage"><div id="book"></div><div id="hint">Swipe, use ← → keys, or click a page edge to turn</div></div>
+<footer>
+  <button class="nav" id="prev" aria-label="Previous">&#x2039;</button>
+  <input type="range" id="slider" min="0" max="219" value="0" aria-label="Jump to page">
+  <button class="nav" id="next" aria-label="Next">&#x203A;</button>
+  <div id="count"></div>
+</footer>
+</div>
+<script>const HOT = [[1, 0.1136, 0.1324, 10], [1, 0.1325, 0.1513, 10], [1, 0.1515, 0.1703, 13], [1, 0.1704, 0.1892, 18], [1, 0.1894, 0.2082, 27], [1, 0.2083, 0.2271, 28], [1, 0.2273, 0.2461, 35], [1, 0.2462, 0.265, 39], [1, 0.2652, 0.284, 42], [1, 0.2842, 0.3029, 47], [1, 0.3031, 0.3219, 48], [1, 0.3221, 0.3408, 50], [1, 0.341, 0.3598, 52], [1, 0.36, 0.3788, 54], [1, 0.3789, 0.3977, 57], [1, 0.3979, 0.4167, 57], [1, 0.4168, 0.4356, 66], [1, 0.4358, 0.4546, 66], [1, 0.4547, 0.4735, 68], [1, 0.4737, 0.4925, 81], [1, 0.4926, 0.5114, 88], [1, 0.5116, 0.5304, 95], [1, 0.5306, 0.5493, 96], [1, 0.5495, 0.5683, 98], [1, 0.5685, 0.5873, 100], [1, 0.5874, 0.6062, 103], [1, 0.6064, 0.6252, 112], [1, 0.6253, 0.6441, 114], [1, 0.6443, 0.6631, 126], [1, 0.6632, 0.682, 128], [1, 0.6822, 0.701, 130], [1, 0.7011, 0.7199, 130], [1, 0.7201, 0.7389, 131], [1, 0.7391, 0.7578, 136], [1, 0.758, 0.7768, 139], [1, 0.777, 0.7958, 148], [1, 0.7959, 0.8147, 149], [1, 0.8149, 0.8337, 150], [1, 0.8338, 0.8526, 169], [1, 0.8528, 0.8716, 170], [1, 0.8717, 0.8905, 174], [1, 0.8907, 0.9095, 177], [1, 0.9096, 0.9284, 180], [1, 0.9286, 0.9474, 181], [1, 0.9475, 0.9663, 187], [2, 0.0711, 0.0899, 189], [2, 0.09, 0.1088, 190], [2, 0.109, 0.1278, 201], [2, 0.1279, 0.1467, 202], [2, 0.1469, 0.1657, 202], [2, 0.1658, 0.1846, 205], [2, 0.1848, 0.2036, 206], [2, 0.2038, 0.2225, 212], [2, 0.2227, 0.2415, 213], [2, 0.2417, 0.2605, 215]];
+function startBook(P, TOC){
+const N = P.length, LAST = N - 1, NINT = N - 4;            // real pages: 0 front cover, 1..252 interior, 253 back cover
+const AR = 396 / 612;                                     // page aspect (5.5 x 8.5 in)
+const SLOTS = N + 2;                                      // spread slots: 0 front, 1 inside front, 2..253 interior, 254 inside back, 255 back
+const stage = document.getElementById('stage'), book = document.getElementById('book');
+const slider = document.getElementById('slider'), count = document.getElementById('count'); slider.max = LAST;
+const tocSel = document.getElementById('toc');
+let cur = 0, spreadMode = true, W = 300, H = 460, busy = false, pending = null;
+
+const src = r => P[r];
+const label = r => r === 0 ? 'Front cover' : r === LAST ? 'Back cover' : r <= 2 ? 'Today\u2019s changes' : 'p. ' + (r - 2);
+const slotOf = r => r === 0 ? 0 : r === LAST ? SLOTS - 1 : r + 1;
+const realOf = s => s === 0 ? 0 : s === SLOTS - 1 ? LAST : (s >= 2 && s <= N - 1) ? s - 1 : (s === 1 || s === SLOTS - 2) ? 'blank' : null;
+const spreadOf = r => Math.floor((slotOf(r) + 1) / 2);
+const NSPREAD = Math.floor(SLOTS / 2) + 1;
+const spreadSlots = sp => [2 * sp - 1, 2 * sp];
+function firstReal(sp){ for (const s of spreadSlots(sp)) { const r = realOf(s); if (typeof r === 'number') return r; } return 0; }
+
+// small decoded-image cache (only nearby pages are ever turned into <img>)
+const cache = new Map();
+function preload(r){ if (r < 0 || r > LAST || cache.has(r)) return; const im = new Image(); im.decoding = 'async'; im.src = src(r); cache.set(r, im); if (cache.size > 16) cache.delete(cache.keys().next().value); }
+
+function pageEl(slot, cls){
+  const d = document.createElement('div'); d.className = 'page ' + (cls || '');
+  const r = realOf(slot);
+  if (r === null || r === undefined) d.classList.add('none');
+  else if (r === 'blank') d.classList.add('blank');
+  else { const im = document.createElement('img'); im.alt = label(r); im.draggable = false; im.src = src(r); d.appendChild(im); d.dataset.r = r; }
+  return d;
+}
+function present(slot){ const r = realOf(slot); return r !== null && r !== undefined; }
+
+function layout(){
+  const sw = stage.clientWidth, sh = stage.clientHeight;
+  spreadMode = (window.innerWidth > window.innerHeight) && window.innerWidth >= 560;
+  const pad = spreadMode ? 28 : 14;
+  if (spreadMode) { H = Math.min(sh - pad, (sw - pad) / (2 * AR)); }
+  else { H = Math.min(sh - pad, (sw - pad) / AR); }
+  H = Math.max(120, Math.floor(H)); W = Math.floor(H * AR);
+  book.style.width = (spreadMode ? 2 * W : W) + 'px'; book.style.height = H + 'px';
+  book.className = spreadMode ? 'spread' : 'single';
+  render();
+}
+
+function centerShift(sp){
+  const [l, r] = spreadSlots(sp);
+  if (!present(l) && present(r)) return -W / 2;
+  if (present(l) && !present(r)) return W / 2;
+  return 0;
+}
+
+function render(){
+  book.innerHTML = '';
+  if (spreadMode) {
+    const sp = spreadOf(cur), [l, r] = spreadSlots(sp);
+    book.appendChild(half(0, l, 'spine-l')); book.appendChild(half(W, r, 'spine-r'));
+    book.style.transform = 'translateX(' + centerShift(sp) + 'px)';
+    for (let k = -2; k <= 3; k++) { const s2 = sp + k; if (s2 >= 0 && s2 < NSPREAD) spreadSlots(s2).forEach(s => { const x = realOf(s); if (typeof x === 'number') preload(x); }); }
+  } else {
+    book.style.transform = '';
+    const h = document.createElement('div'); h.className = 'half'; h.style.left = '0'; h.style.width = W + 'px';
+    h.appendChild(pageEl(slotOf(cur))); book.appendChild(h);
+    for (let k = -2; k <= 3; k++) preload(cur + k);
+  }
+  updateUI();
+}
+function half(x, slot, spine){
+  const h = document.createElement('div'); h.className = 'half'; h.style.left = x + 'px'; h.style.width = W + 'px';
+  if (present(slot)) { const sh = document.createElement('div'); sh.className = 'book-shadow'; sh.style.left = '0'; sh.style.width = '100%'; h.appendChild(sh); }
+  const p = pageEl(slot, present(slot) ? spine : ''); h.appendChild(p); return h;
+}
+
+function updateUI(){
+  let txt;
+  if (spreadMode) {
+    const rs = spreadSlots(spreadOf(cur)).map(realOf).filter(x => typeof x === 'number');
+    if (rs.length === 2 && rs[0] > 2 && rs[1] < LAST) txt = 'pp. ' + (rs[0] - 2) + '–' + (rs[1] - 2); else if (rs.length === 2 && rs[0] === 1) txt = 'Today\u2019s changes';
+    else txt = rs.map(label).join(' · ') || label(cur);
+  } else txt = label(cur);
+  count.textContent = txt + (txt.indexOf('cover') < 0 ? ' / ' + NINT : '');
+  slider.value = cur;
+  document.getElementById('prev').disabled = atStart();
+  document.getElementById('next').disabled = atEnd();
+  // TOC: last entry whose start <= current page
+  let best = 0; const look = spreadMode ? Math.max(...spreadSlots(spreadOf(cur)).map(realOf).filter(x => typeof x === 'number')) : cur;
+  TOC.forEach((t, i) => { if (t[2] <= look) best = i; });
+  tocSel.value = String(best);
+  try { history.replaceState(null, '', '#p=' + cur); } catch (e) {}
+}
+const atStart = () => spreadMode ? spreadOf(cur) === 0 : cur === 0;
+const atEnd = () => spreadMode ? spreadOf(cur) === NSPREAD - 1 : cur === LAST;
+
+function goTo(r, anim){
+  r = Math.max(0, Math.min(LAST, r | 0));
+  if (busy) { pending = [r, anim]; return; }
+  if (spreadMode) {
+    const a = spreadOf(cur), b = spreadOf(r);
+    if (a === b) { cur = r; updateUI(); return; }
+    if (anim === false || matchMedia('(prefers-reduced-motion: reduce)').matches) { cur = r; render(); return; }
+    flip(a, b, r);
+  } else {
+    if (r === cur) return;
+    if (anim === false) { cur = r; render(); return; }
+    (window.innerWidth >= 700 ? pflip : slide)(cur, r);
+  }
+}
+const base = () => pending ? pending[0] : cur;
+function next(){ const cur = base(); if (spreadMode) { const sp = spreadOf(cur); if (sp < NSPREAD - 1) goTo(firstReal(sp + 1)); } else goTo(cur + 1); }
+function prev(){ const cur = base(); if (spreadMode) { const sp = spreadOf(cur); if (sp > 0) goTo(firstReal(sp - 1)); } else goTo(cur - 1); }
+
+function done(){ busy = false; if (pending) { const p = pending; pending = null; goTo(p[0], p[1]); } }
+
+function flip(a, b, target){
+  busy = true;
+  const fwd = b > a, [al, ar] = spreadSlots(a), [bl, br] = spreadSlots(b);
+  book.innerHTML = '';
+  const dur = Math.abs(b - a) > 1 ? 650 : 560;
+  // static halves under the turning leaf
+  book.appendChild(half(0, fwd ? al : bl, 'spine-l'));
+  book.appendChild(half(W, fwd ? br : ar, 'spine-r'));
+  const leaf = document.createElement('div'); leaf.className = 'leaf';
+  leaf.style.width = W + 'px'; leaf.style.left = (fwd ? W : 0) + 'px';
+  leaf.style.transformOrigin = fwd ? 'left center' : 'right center';
+  const f1 = document.createElement('div'); f1.className = 'face front';
+  const f2 = document.createElement('div'); f2.className = 'face back';
+  const frontSlot = fwd ? ar : al, backSlot = fwd ? bl : br;
+  f1.appendChild(pageEl(frontSlot, fwd ? 'spine-r' : 'spine-l')); f2.appendChild(pageEl(backSlot, fwd ? 'spine-l' : 'spine-r'));
+  if (!present(frontSlot)) f1.style.background = 'transparent';
+  if (!present(backSlot)) f2.style.background = 'transparent';
+  const s1 = document.createElement('div'); s1.className = 'shade'; s1.style.background = 'linear-gradient(' + (fwd ? 'to left' : 'to right') + ',rgba(0,0,0,.35),rgba(0,0,0,0) 60%)';
+  const s2 = document.createElement('div'); s2.className = 'shade'; s2.style.background = 'linear-gradient(' + (fwd ? 'to right' : 'to left') + ',rgba(0,0,0,.35),rgba(0,0,0,0) 60%)';
+  f1.appendChild(s1); f2.appendChild(s2);
+  leaf.appendChild(f1); leaf.appendChild(f2); book.appendChild(leaf);
+  book.style.perspective = (W * 5) + 'px';
+  book.style.transform = 'translateX(' + centerShift(b) + 'px)';
+  const end = fwd ? -180 : 180;
+  const ease = 'cubic-bezier(.45,.05,.35,1)';
+  const an = leaf.animate([{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(' + end / 2 + 'deg) translateZ(1px)' }, { transform: 'rotateY(' + end + 'deg)' }], { duration: dur, easing: ease, fill: 'forwards' });
+  s1.animate([{ opacity: 0 }, { opacity: 1 }], { duration: dur / 2, easing: 'ease-in', fill: 'forwards' });
+  s2.animate([{ opacity: 1 }, { opacity: 1, offset: .5 }, { opacity: 0 }], { duration: dur, easing: 'ease-out', fill: 'forwards' });
+  an.onfinish = () => { cur = target; render(); done(); };
+  cur = target; updateUI();
+}
+
+function slide(from, to){
+  busy = true;
+  const dir = to > from ? 1 : -1;
+  book.innerHTML = '';
+  const mk = r => { const h = document.createElement('div'); h.className = 'half'; h.style.left = '0'; h.style.width = W + 'px'; h.appendChild(pageEl(slotOf(r))); book.appendChild(h); return h; };
+  const o = mk(from), n = mk(to);
+  const dx = W + 40, opt = { duration: 320, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' };
+  o.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: 'translateX(' + (-dir * dx) + 'px)', opacity: .4 }], opt);
+  const an = n.animate([{ transform: 'translateX(' + (dir * dx) + 'px)' }, { transform: 'translateX(0)' }], opt);
+  an.onfinish = () => { cur = to; render(); done(); };
+  cur = to; updateUI();
+}
+
+function pflip(from, to){
+  busy = true;
+  const fwd = to > from; book.innerHTML = '';
+  const mk = (r, leaf) => { const h = document.createElement('div'); h.className = 'half' + (leaf ? ' leaf' : ''); h.style.left = '0'; h.style.width = W + 'px';
+    const f = document.createElement('div'); f.className = 'face'; f.appendChild(pageEl(slotOf(r)));
+    const sh = document.createElement('div'); sh.className = 'shade'; sh.style.background = 'linear-gradient(to left,rgba(0,0,0,.4),rgba(0,0,0,0) 70%)'; f.appendChild(sh);
+    h.appendChild(f); book.appendChild(h); return [h, sh]; };
+  const [under, ush] = mk(fwd ? to : from, false); const [leaf, sh] = mk(fwd ? from : to, true);
+  under.firstChild.style.boxShadow = '0 10px 30px rgba(0,0,0,.55)';
+  leaf.style.transformOrigin = 'left center'; book.style.perspective = (W * 3) + 'px';
+  const dur = 560, ease = 'cubic-bezier(.45,.05,.35,1)';
+  const a = fwd ? [{ transform: 'rotateY(0deg)' }, { transform: 'rotateY(-180deg)' }] : [{ transform: 'rotateY(-180deg)' }, { transform: 'rotateY(0deg)' }];
+  const an = leaf.animate(a, { duration: dur, easing: ease, fill: 'forwards' });
+  sh.animate(fwd ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 1 }, { opacity: 0 }], { duration: dur / 2, easing: 'linear', fill: 'forwards', delay: fwd ? 0 : dur / 2 });
+  ush.animate(fwd ? [{ opacity: .8 }, { opacity: 0 }] : [{ opacity: 0 }, { opacity: .8 }], { duration: dur, easing: 'linear', fill: 'forwards' });
+  an.onfinish = () => { cur = to; render(); done(); };
+  cur = to; updateUI();
+}
+
+// ---- input ----
+document.getElementById('next').onclick = next;
+document.getElementById('prev').onclick = prev;
+slider.addEventListener('input', () => goTo(+slider.value, false));
+TOC.forEach((t, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = (t[0] > 1 ? '\u00A0\u00A0\u00A0· ' : '') + t[1] + (t[2] > 2 && t[2] < LAST && t[1].indexOf('p.') !== 0 ? '  (p. ' + (t[2] - 2) + ')' : ''); tocSel.appendChild(o); });
+tocSel.addEventListener('change', () => { goTo(TOC[+tocSel.value][2], false); tocSel.blur(); });
+const fsBtn = document.getElementById('fs');
+const fsEl = document.documentElement;
+if (!(fsEl.requestFullscreen || fsEl.webkitRequestFullscreen)) fsBtn.style.display = 'none';
+function toggleFS(){
+  if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else (fsEl.requestFullscreen || fsEl.webkitRequestFullscreen).call(fsEl);
+}
+fsBtn.onclick = toggleFS;
+document.addEventListener('keydown', e => {
+  if (e.target === tocSel || e.target === slider) return;
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  const k = e.key;
+  if (k === 'ArrowRight' || k === 'PageDown' || k === ' ') { e.preventDefault(); next(); }
+  else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); prev(); }
+  else if (k === 'Home') { e.preventDefault(); goTo(0, false); }
+  else if (k === 'End') { e.preventDefault(); goTo(LAST, false); }
+  else if (k === 'f' || k === 'F') toggleFS();
+});
+// swipe (touch + mouse drag) and click-to-turn
+let px = null, py = null, pt = 0;
+stage.addEventListener('pointerdown', e => { if (e.button > 0) return; px = e.clientX; py = e.clientY; pt = Date.now(); });
+stage.addEventListener('pointerup', e => {
+  if (px === null) return;
+  const dx = e.clientX - px, dy = e.clientY - py; px = null;
+  if (Math.abs(dx) < 8 && Math.abs(dy) < 8 && (() => { const el = document.elementsFromPoint(e.clientX, e.clientY).find(x => x.classList && x.classList.contains('page') && x.dataset.r); window.__hotEl = el; return !!el; })()) { const pe = window.__hotEl, rr = +pe.dataset.r, b = pe.getBoundingClientRect(), fy = (e.clientY - b.top) / b.height;
+    const h = HOT.find(x => x[0] === rr && fy >= x[1] && fy <= x[2]); if (h) { goTo(h[3], false); return; } }
+  if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.2) { dx < 0 ? next() : prev(); return; }
+  if (Math.abs(dx) < 8 && Math.abs(dy) < 8 && Date.now() - pt < 600) {
+    const rc = book.getBoundingClientRect(), mid = rc.left + rc.width / 2;
+    if (spreadMode) { const sp = spreadOf(cur); const [l, r] = spreadSlots(sp); const m = present(l) && present(r) ? mid : rc.left + rc.width / 2 + (present(l) ? -W / 2 : W / 2); e.clientX >= m ? next() : prev(); }
+    else (e.clientX >= mid ? next() : prev());
+  }
+});
+stage.addEventListener('pointercancel', () => { px = null; });
+let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(layout, 80); });
+document.addEventListener('fullscreenchange', layout);
+const m = /p=(\d+)/.exec(location.hash); if (m) cur = Math.max(0, Math.min(LAST, +m[1]));
+layout();
+if (matchMedia('(pointer:coarse)').matches) document.getElementById('hint').textContent = 'Swipe or tap a page edge to turn';
+setTimeout(() => { document.getElementById('hint').style.opacity = 0; }, 3500);
+window.__flip = { goTo, next, prev, state: () => ({ cur, spreadMode, W, H, busy }) };
+}
+</script>
+<script>
+(function(){
+const CFG = {"id": "e06f44ccc951", "bin": "book.e06f44ccc951.bin", "size": 19147947, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "ibJlkzRDMoLFLvHT", "check": "FXcwetXNBXHyd4AJ4FC7M/r3pRZojQ=="};
+const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
+const KEYNAME = 'gys-flipbook-key', LEGACY = 'gys-flipbook-key-';
+const $ = id => document.getElementById(id);
+const msg = (t, err) => { $('msg').textContent = t; $('msg').className = err ? 'err' : ''; };
+const enc = new TextEncoder();
+let dl = null;
+function store(k, v){ try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+function load(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+function download(){
+  if (dl) return dl;
+  dl = (async () => {
+    const r = await fetch(CFG.bin + '?v=' + CFG.id);
+    if (!r.ok) throw new Error('Download failed (' + r.status + ')');
+    if (!r.body || !r.body.getReader) return new Uint8Array(await r.arrayBuffer());
+    const total = CFG.size, out = new Uint8Array(total), rd = r.body.getReader(); let got = 0;
+    for (;;) { const { done, value } = await rd.read(); if (done) break;
+      if (got + value.length > out.length) throw new Error('Unexpected file size');
+      out.set(value, got); got += value.length; dl.progress = got / total; if (dl.onprogress) dl.onprogress(dl.progress); }
+    if (got !== total) throw new Error('Incomplete download (' + got + ' of ' + total + ' bytes)');
+    return out;
+  })();
+  dl.progress = 0; dl.catch(() => { dl = null; });
+  return dl;
+}
+async function deriveKey(pw){
+  const base = await crypto.subtle.importKey('raw', enc.encode(pw), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: SALT, iterations: CFG.iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, true, ['decrypt']);
+}
+async function verify(key){
+  try { const r = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: IVC, additionalData: enc.encode('GYS-check') }, key, CHECK); return new TextDecoder().decode(r) === 'GYS-OK'; }
+  catch (e) { return false; }
+}
+async function openBook(key){
+  $('go').disabled = true; $('bar').style.display = 'block';
+  const bar = $('bar').firstElementChild;
+  const d = download();
+  const show = p => { bar.style.width = Math.round(p * 100) + '%'; msg('Loading the book… ' + Math.round(p * 100) + '%'); };
+  d.onprogress = show; show(d.progress || 0);
+  const buf = await d;
+  msg('Unlocking…'); bar.style.width = '100%';
+  await new Promise(r => setTimeout(r, 30));
+  const t0 = performance.now();
+  if (String.fromCharCode.apply(null, buf.subarray(0, 8)) !== 'GYSENC1\0') throw new Error('Bad file');
+  const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: buf.subarray(8, 20), additionalData: enc.encode('GYS-book') }, key, buf.subarray(20)));
+  const dv = new DataView(plain.buffer, plain.byteOffset), hl = dv.getUint32(4, true);
+  const hdr = JSON.parse(new TextDecoder().decode(plain.subarray(8, 8 + hl)));
+  const base = 8 + hl;
+  const urls = hdr.offs.map(([o, n]) => URL.createObjectURL(new Blob([plain.subarray(base + o, base + o + n)], { type: 'image/jpeg' })));
+  window.__decryptMs = Math.round(performance.now() - t0);
+  $('lock').remove();
+  startBook(urls, hdr.toc);
+}
+async function unlock(pw, remember){
+  msg('Checking password…');
+  const key = await deriveKey(pw);
+  if (!(await verify(key))) { msg('Wrong password. Please try again.', true); $('pw').select(); return; }
+  if (remember) store(KEYNAME, b64(new Uint8Array(await crypto.subtle.exportKey('raw', key))));
+  else store(KEYNAME, null);
+  await openBook(key);
+}
+$('lockform').addEventListener('submit', e => {
+  e.preventDefault(); $('pw').blur();
+  unlock($('pw').value, $('remember').checked).catch(err => { $('go').disabled = false; msg((err && err.message) || 'Something went wrong', true); });
+});
+function legacyKeys(){ try { return Object.keys(localStorage).filter(k => k.indexOf(LEGACY) === 0); } catch (e) { return []; } }
+$('lockbtn').addEventListener('click', () => { if (confirm('Lock the preview and forget the password on this device?')) { store(KEYNAME, null); legacyKeys().forEach(k => store(k, null)); location.hash = ''; location.reload(); } });
+if (!(window.crypto && crypto.subtle)) { msg('This browser cannot open the preview (Web Crypto needs HTTPS and a current browser).', true); $('go').disabled = true; return; }
+download();  // start fetching the (encrypted) book right away
+// remembered key: current name first, then keys saved by earlier builds (same password + salt -> same key)
+const cands = [KEYNAME].concat(legacyKeys()).map(k => [k, load(k)]).filter(x => x[1]);
+if (cands.length) (async () => {
+  try {
+    for (const [name, saved] of cands) {
+      let key; try { key = await crypto.subtle.importKey('raw', ub64(saved), { name: 'AES-GCM' }, true, ['decrypt']); } catch (e) { store(name, null); continue; }
+      if (await verify(key)) {
+        if (name !== KEYNAME) { store(KEYNAME, saved); store(name, null); }
+        msg('Welcome back…'); await openBook(key); return;
+      }
+      store(name, null);
+    }
+  } catch (err) { $('go').disabled = false; msg((err && err.message) || 'Something went wrong', true); }
+})();
+})();
+</script>
+</body></html>
