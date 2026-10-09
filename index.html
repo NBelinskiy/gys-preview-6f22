@@ -180,14 +180,14 @@ body.cdock #app{left:360px}
 <div id="stage"><div id="book"></div><div id="hint">Swipe, use ← → keys, or click a page edge to turn</div></div>
 <footer>
   <button class="nav" id="prev" aria-label="Previous">&#x2039;</button>
-  <input type="range" id="slider" min="0" max="219" value="0" aria-label="Jump to page">
+  <input type="range" id="slider" min="0" max="217" value="0" aria-label="Jump to page">
   <button class="nav" id="next" aria-label="Next">&#x203A;</button>
   <div id="count"></div>
 </footer>
 </div>
-<script>const HOT = [[1, 0.1136, 0.1324, 7], [1, 0.1296, 0.1483, 10], [1, 0.1455, 0.1643, 10], [1, 0.1615, 0.1803, 10], [1, 0.1775, 0.1963, 10], [1, 0.1935, 0.2123, 13], [1, 0.2095, 0.2283, 13], [1, 0.2255, 0.2443, 18], [1, 0.2415, 0.2603, 25], [1, 0.2575, 0.2763, 27], [1, 0.2735, 0.2923, 28], [1, 0.2895, 0.3083, 30], [1, 0.3055, 0.3243, 35], [1, 0.3215, 0.3403, 35], [1, 0.3375, 0.3562, 39], [1, 0.3534, 0.3722, 39], [1, 0.3694, 0.3882, 42], [1, 0.3854, 0.4042, 44], [1, 0.4014, 0.4202, 45], [1, 0.4174, 0.4362, 46], [1, 0.4334, 0.4522, 47], [1, 0.4494, 0.4682, 47], [1, 0.4654, 0.4842, 48], [1, 0.4814, 0.5002, 50], [1, 0.4974, 0.5162, 52], [1, 0.5134, 0.5322, 52], [1, 0.5294, 0.5482, 52], [1, 0.5454, 0.5641, 52], [1, 0.5613, 0.5801, 53], [1, 0.5773, 0.5961, 57], [1, 0.5933, 0.6121, 57], [1, 0.6093, 0.6281, 57], [1, 0.6253, 0.6441, 59], [1, 0.6413, 0.6601, 61], [1, 0.6573, 0.6761, 66], [1, 0.6733, 0.6921, 66], [1, 0.6893, 0.7081, 68], [1, 0.7053, 0.7241, 80], [1, 0.7213, 0.7401, 80], [1, 0.7373, 0.756, 82], [1, 0.7533, 0.772, 90], [1, 0.7692, 0.788, 97], [1, 0.7852, 0.804, 97], [1, 0.8012, 0.82, 98], [1, 0.8172, 0.836, 98], [1, 0.8332, 0.852, 100], [1, 0.8492, 0.868, 100], [1, 0.8652, 0.884, 100], [1, 0.8812, 0.9, 101], [1, 0.8972, 0.916, 102], [1, 0.9132, 0.932, 102], [1, 0.9292, 0.948, 102], [1, 0.9452, 0.9639, 102], [2, 0.0711, 0.0899, 105], [2, 0.0871, 0.1059, 114], [2, 0.1031, 0.1219, 116], [2, 0.1191, 0.1378, 128], [2, 0.135, 0.1538, 130], [2, 0.151, 0.1698, 132], [2, 0.167, 0.1858, 132], [2, 0.183, 0.2018, 132], [2, 0.199, 0.2178, 132], [2, 0.215, 0.2338, 133], [2, 0.231, 0.2498, 138], [2, 0.247, 0.2658, 141], [2, 0.263, 0.2818, 150], [2, 0.279, 0.2978, 151], [2, 0.295, 0.3138, 152], [2, 0.311, 0.3298, 156], [2, 0.327, 0.3457, 161], [2, 0.3429, 0.3617, 169], [2, 0.3589, 0.3777, 172], [2, 0.3749, 0.3937, 172], [2, 0.3909, 0.4097, 175], [2, 0.4069, 0.4257, 175], [2, 0.4229, 0.4417, 179], [2, 0.4389, 0.4577, 182], [2, 0.4549, 0.4737, 183], [2, 0.4709, 0.4897, 183], [2, 0.4869, 0.5057, 189], [2, 0.5029, 0.5217, 191], [2, 0.5189, 0.5377, 192], [2, 0.5349, 0.5536, 203], [2, 0.5508, 0.5696, 204], [2, 0.5668, 0.5856, 204], [2, 0.5828, 0.6016, 207], [2, 0.5988, 0.6176, 207], [2, 0.6148, 0.6336, 208], [2, 0.6308, 0.6496, 210], [2, 0.6468, 0.6656, 214], [2, 0.6628, 0.6816, 215], [2, 0.6788, 0.6976, 215], [2, 0.6948, 0.7136, 217], [2, 0.7108, 0.7296, 217]];
+<script>const HOT = [];
 function startBook(P, TOC, MEMO){
-const N = P.length, LAST = N - 1, NINT = N - 4;            // real pages: 0 front cover, 1..252 interior, 253 back cover
+const N = P.length, LAST = N - 1, NINT = N - 2;            // real pages: 0 front cover, 1..252 interior, 253 back cover
 const AR = 396 / 612;                                     // page aspect (5.5 x 8.5 in)
 const SLOTS = N + 2;                                      // spread slots: 0 front, 1 inside front, 2..253 interior, 254 inside back, 255 back
 const stage = document.getElementById('stage'), book = document.getElementById('book');
@@ -196,7 +196,7 @@ const tocSel = document.getElementById('toc');
 let cur = 0, spreadMode = true, W = 300, H = 460, busy = false, pending = null;
 
 const src = r => P[r];
-const label = r => r === 0 ? 'Front cover' : r === LAST ? 'Back cover' : r <= 2 ? 'Today\u2019s changes' : 'p. ' + (r - 2);
+const label = r => r === 0 ? 'Front cover' : r === LAST ? 'Back cover' : 'p. ' + r;   // t98u: no changes-index pages
 const slotOf = r => r === 0 ? 0 : r === LAST ? SLOTS - 1 : r + 1;
 const realOf = s => s === 0 ? 0 : s === SLOTS - 1 ? LAST : (s >= 2 && s <= N - 1) ? s - 1 : (s === 1 || s === SLOTS - 2) ? 'blank' : null;
 const spreadOf = r => Math.floor((slotOf(r) + 1) / 2);
@@ -263,7 +263,7 @@ function updateUI(){
   let txt;
   if (spreadMode) {
     const rs = spreadSlots(spreadOf(cur)).map(realOf).filter(x => typeof x === 'number');
-    if (rs.length === 2 && rs[0] > 2 && rs[1] < LAST) txt = 'pp. ' + (rs[0] - 2) + '–' + (rs[1] - 2); else if (rs.length === 2 && rs[0] === 1) txt = 'Today\u2019s changes';
+    if (rs.length === 2 && rs[0] > 0 && rs[1] < LAST) txt = 'pp. ' + rs[0] + '–' + rs[1];
     else txt = rs.map(label).join(' · ') || label(cur);
   } else txt = label(cur);
   count.textContent = txt + (txt.indexOf('cover') < 0 ? ' / ' + NINT : '');
@@ -371,7 +371,7 @@ function showMemo(i, el, pin){
   const sr = stage.getBoundingClientRect(), pr = pg.getBoundingClientRect();
   const hs = [...pg.querySelectorAll('.mhot[data-m="' + i + '"]')].map(x => x.getBoundingClientRect());
   const et = Math.min(...hs.map(b => b.top)), eb = Math.max(...hs.map(b => b.bottom)), el0 = Math.min(...hs.map(b => b.left)), er1 = Math.max(...hs.map(b => b.right));
-  const isLeft = ((+pg.dataset.r) - 2) % 2 === 0;
+  const isLeft = (+pg.dataset.r) % 2 === 0;
   const space = isLeft ? pr.left - sr.left : sr.right - pr.right;
   memoEl.style.visibility = 'hidden'; memoEl.style.display = 'block'; memoEl.style.maxHeight = '';
   if (space >= 170) {                                   // margin note beside the page (left page -> left margin, right page -> right margin)
@@ -416,7 +416,7 @@ function pflip(from, to){
 document.getElementById('next').onclick = next;
 document.getElementById('prev').onclick = prev;
 slider.addEventListener('input', () => goTo(+slider.value, false));
-TOC.forEach((t, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = (t[0] > 1 ? '\u00A0\u00A0\u00A0· ' : '') + t[1] + (t[2] > 2 && t[2] < LAST && t[1].indexOf('p.') !== 0 ? '  (p. ' + (t[2] - 2) + ')' : ''); tocSel.appendChild(o); });
+TOC.forEach((t, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = (t[0] > 1 ? '\u00A0\u00A0\u00A0· ' : '') + t[1] + (t[2] > 0 && t[2] < LAST && t[1].indexOf('p.') !== 0 ? '  (p. ' + t[2] + ')' : ''); tocSel.appendChild(o); });
 tocSel.addEventListener('change', () => { goTo(TOC[+tocSel.value][2], false); tocSel.blur(); });
 const fsBtn = document.getElementById('fs');
 const fsEl = document.documentElement;
@@ -578,7 +578,7 @@ window.__initChanges = function(C, N, U){
     U.entries.forEach(e => { const li = $('li', 'uitem'); li.dataset.id = e.id;
       const top = $('div', 'utop'); top.appendChild($('span', '', N.uReceived + ' ' + e.received + ' \u00b7 ' + e.from)); top.appendChild($('span', 'ust ' + cls(e.status), e.status)); li.appendChild(top);
       li.appendChild($('div', 'usub', e.subject)); if (e.note) li.appendChild($('div', 'unote', e.note));
-      (e.changes || []).forEach(c => { const d = $('div', 'uch', c.text); (c.pages || []).forEach(p => { const a = $('a', '', N.uPages + p); a.onclick = ev => { ev.stopPropagation(); jump({ r: p + 2, rects: [] }); }; d.appendChild(a); }); li.appendChild(d); });
+      (e.changes || []).forEach(c => { const d = $('div', 'uch', c.text); (c.pages || []).forEach(p => { const a = $('a', '', N.uPages + p); a.onclick = ev => { ev.stopPropagation(); jump({ r: p + (N.pageOff === undefined ? 2 : N.pageOff), rects: [] }); }; d.appendChild(a); }); li.appendChild(d); });
       li.appendChild($('div', 'upub', N.uPublished + ': ' + (e.published || N.uNotYet))); ulst.appendChild(li); });
   } else tabs.style.display = 'none';
   const cview = [cnt, fv, fs, ul, foot];
@@ -700,7 +700,7 @@ window.__initChanges = function(C, N, U){
 
 <script>
 (function(){
-const CFG = {"id": "69be0af121cf", "bin": "book.69be0af121cf.bin", "size": 17176840, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "xfqsY/+7W5s+j5go", "check": "dUn7iPMGoBvbi3D+sOfoaU3eL81c8Q=="};
+const CFG = {"id": "e0caf12f0bba", "bin": "book.e0caf12f0bba.bin", "size": 16954285, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "X8VhYhhhH3/PZDgP", "check": "dtc5qDaWBAfbMlFeCdYtPLZ6+QBqHg=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
