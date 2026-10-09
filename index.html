@@ -135,6 +135,20 @@ body.ndock #app{right:360px}
 #cpanel .ctools{display:flex;gap:6px;margin-top:6px}#cpanel .ctools button{flex:1 1 auto;padding:5px;font-size:12px}
 #cpanel .cstat{min-height:16px;font-size:12px;color:#9fd49f;margin-top:5px}#cpanel .cstat.err{color:#ff8a80}
 #cbtn.on{background:#d4a24c;color:#111}
+#cpanel .ctabs{display:flex;gap:0;border-bottom:1px solid #3a3c41;background:#1d1e21}
+#cpanel .ctabs button{flex:1 1 50%;border:0;border-radius:0;background:none;padding:8px;font-weight:600;color:#a9abb0;border-bottom:2px solid transparent}
+#cpanel .ctabs button.on{color:#fff;border-bottom-color:#d4a24c}
+#cpanel .ucur{padding:9px 12px;font-size:13px;font-weight:600;color:#e8d3a6;border-bottom:1px solid #3a3c41}
+#cpanel .ulist{flex:1 1 auto;overflow:auto;list-style:none;margin:0;padding:0 10px 10px;-webkit-overflow-scrolling:touch}
+#cpanel .uitem{background:#2b2d31;border:1px solid #3a3c41;border-radius:6px;padding:8px 10px;margin:8px 0}
+#cpanel .uitem .utop{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#a9abb0}
+#cpanel .ust{margin-left:auto;font-size:11px;padding:1px 7px;border-radius:9px;background:#3a3c41;color:#ddd;white-space:nowrap}
+#cpanel .ust.done{background:#245c2a;color:#bff0bf}#cpanel .ust.prog{background:#5c4a1c;color:#ffe4a8}#cpanel .ust.clar{background:#6b2420;color:#ffd0cc}#cpanel .ust.recv{background:#24476b;color:#cfe4ff}
+#cpanel .usub{font-weight:600;font-size:12.5px;margin:4px 0 2px}
+#cpanel .unote{font-size:12px;font-style:italic;color:#cfd0d3;margin-bottom:4px;word-break:break-word}
+#cpanel .uch{font-size:12px;margin:3px 0;padding-left:10px;border-left:2px solid #45c552}
+#cpanel .uch a{color:#8fc3ff;cursor:pointer;margin-left:4px;text-decoration:underline}
+#cpanel .upub{font-size:11.5px;color:#a9abb0;margin-top:4px}
 body.cdock #app{left:360px}
 .page .cflash{position:absolute;pointer-events:none;border-radius:3px;background:rgba(255,170,0,.35);box-shadow:0 0 0 2px rgba(255,140,0,.9);animation:cfl 2.2s ease-out forwards;z-index:4}
 @keyframes cfl{0%{opacity:0}12%{opacity:1}30%{opacity:.35}48%{opacity:1}100%{opacity:0}}
@@ -147,7 +161,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 8, 2026 (v18 – changes highlighted). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 9, 2026 (v19 – changes highlighted). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -157,7 +171,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v18 (B&amp;W, 10.5 pt) · Oct 8, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v19 (B&amp;W, 10.5 pt) · Oct 9, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -171,7 +185,7 @@ body.cdock #app{left:360px}
   <div id="count"></div>
 </footer>
 </div>
-<script>const HOT = [[1, 0.1136, 0.1324, 7], [1, 0.1297, 0.1485, 10], [1, 0.1459, 0.1647, 10], [1, 0.1621, 0.1808, 10], [1, 0.1782, 0.197, 10], [1, 0.1944, 0.2132, 13], [1, 0.2105, 0.2293, 13], [1, 0.2267, 0.2455, 18], [1, 0.2429, 0.2617, 25], [1, 0.259, 0.2778, 27], [1, 0.2752, 0.294, 28], [1, 0.2914, 0.3102, 30], [1, 0.3075, 0.3263, 35], [1, 0.3237, 0.3425, 35], [1, 0.3399, 0.3587, 39], [1, 0.356, 0.3748, 39], [1, 0.3722, 0.391, 42], [1, 0.3884, 0.4071, 44], [1, 0.4045, 0.4233, 45], [1, 0.4207, 0.4395, 46], [1, 0.4368, 0.4556, 47], [1, 0.453, 0.4718, 47], [1, 0.4692, 0.488, 48], [1, 0.4853, 0.5041, 50], [1, 0.5015, 0.5203, 52], [1, 0.5177, 0.5365, 52], [1, 0.5338, 0.5526, 52], [1, 0.55, 0.5688, 52], [1, 0.5662, 0.5849, 53], [1, 0.5823, 0.6011, 57], [1, 0.5985, 0.6173, 57], [1, 0.6147, 0.6334, 57], [1, 0.6308, 0.6496, 59], [1, 0.647, 0.6658, 61], [1, 0.6631, 0.6819, 66], [1, 0.6793, 0.6981, 66], [1, 0.6955, 0.7143, 68], [1, 0.7116, 0.7304, 81], [1, 0.7278, 0.7466, 83], [1, 0.744, 0.7628, 90], [1, 0.7601, 0.7789, 97], [1, 0.7763, 0.7951, 97], [1, 0.7925, 0.8112, 98], [1, 0.8086, 0.8274, 98], [1, 0.8248, 0.8436, 100], [1, 0.8409, 0.8597, 100], [1, 0.8571, 0.8759, 100], [1, 0.8733, 0.8921, 101], [1, 0.8894, 0.9082, 102], [1, 0.9056, 0.9244, 102], [1, 0.9218, 0.9406, 102], [1, 0.9379, 0.9567, 102], [2, 0.0711, 0.0899, 105], [2, 0.0872, 0.106, 114], [2, 0.1034, 0.1222, 116], [2, 0.1196, 0.1384, 128], [2, 0.1357, 0.1545, 130], [2, 0.1519, 0.1707, 132], [2, 0.1681, 0.1869, 132], [2, 0.1842, 0.203, 132], [2, 0.2004, 0.2192, 132], [2, 0.2166, 0.2353, 133], [2, 0.2327, 0.2515, 138], [2, 0.2489, 0.2677, 141], [2, 0.265, 0.2838, 150], [2, 0.2812, 0.3, 151], [2, 0.2974, 0.3162, 152], [2, 0.3135, 0.3323, 156], [2, 0.3297, 0.3485, 161], [2, 0.3459, 0.3647, 169], [2, 0.362, 0.3808, 172], [2, 0.3782, 0.397, 172], [2, 0.3944, 0.4132, 175], [2, 0.4105, 0.4293, 175], [2, 0.4267, 0.4455, 179], [2, 0.4429, 0.4616, 182], [2, 0.459, 0.4778, 183], [2, 0.4752, 0.494, 183], [2, 0.4913, 0.5101, 189], [2, 0.5075, 0.5263, 191], [2, 0.5237, 0.5425, 192], [2, 0.5398, 0.5586, 203], [2, 0.556, 0.5748, 204], [2, 0.5722, 0.591, 204], [2, 0.5883, 0.6071, 207], [2, 0.6045, 0.6233, 207], [2, 0.6207, 0.6395, 208], [2, 0.6368, 0.6556, 210], [2, 0.653, 0.6718, 214], [2, 0.6692, 0.6879, 215], [2, 0.6853, 0.7041, 215], [2, 0.7015, 0.7203, 217], [2, 0.7176, 0.7364, 217]];
+<script>const HOT = [[1, 0.1136, 0.1324, 7], [1, 0.1296, 0.1483, 10], [1, 0.1455, 0.1643, 10], [1, 0.1615, 0.1803, 10], [1, 0.1775, 0.1963, 10], [1, 0.1935, 0.2123, 13], [1, 0.2095, 0.2283, 13], [1, 0.2255, 0.2443, 18], [1, 0.2415, 0.2603, 25], [1, 0.2575, 0.2763, 27], [1, 0.2735, 0.2923, 28], [1, 0.2895, 0.3083, 30], [1, 0.3055, 0.3243, 35], [1, 0.3215, 0.3403, 35], [1, 0.3375, 0.3562, 39], [1, 0.3534, 0.3722, 39], [1, 0.3694, 0.3882, 42], [1, 0.3854, 0.4042, 44], [1, 0.4014, 0.4202, 45], [1, 0.4174, 0.4362, 46], [1, 0.4334, 0.4522, 47], [1, 0.4494, 0.4682, 47], [1, 0.4654, 0.4842, 48], [1, 0.4814, 0.5002, 50], [1, 0.4974, 0.5162, 52], [1, 0.5134, 0.5322, 52], [1, 0.5294, 0.5482, 52], [1, 0.5454, 0.5641, 52], [1, 0.5613, 0.5801, 53], [1, 0.5773, 0.5961, 57], [1, 0.5933, 0.6121, 57], [1, 0.6093, 0.6281, 57], [1, 0.6253, 0.6441, 59], [1, 0.6413, 0.6601, 61], [1, 0.6573, 0.6761, 66], [1, 0.6733, 0.6921, 66], [1, 0.6893, 0.7081, 68], [1, 0.7053, 0.7241, 80], [1, 0.7213, 0.7401, 80], [1, 0.7373, 0.756, 82], [1, 0.7533, 0.772, 90], [1, 0.7692, 0.788, 97], [1, 0.7852, 0.804, 97], [1, 0.8012, 0.82, 98], [1, 0.8172, 0.836, 98], [1, 0.8332, 0.852, 100], [1, 0.8492, 0.868, 100], [1, 0.8652, 0.884, 100], [1, 0.8812, 0.9, 101], [1, 0.8972, 0.916, 102], [1, 0.9132, 0.932, 102], [1, 0.9292, 0.948, 102], [1, 0.9452, 0.9639, 102], [2, 0.0711, 0.0899, 105], [2, 0.0871, 0.1059, 114], [2, 0.1031, 0.1219, 116], [2, 0.1191, 0.1378, 128], [2, 0.135, 0.1538, 130], [2, 0.151, 0.1698, 132], [2, 0.167, 0.1858, 132], [2, 0.183, 0.2018, 132], [2, 0.199, 0.2178, 132], [2, 0.215, 0.2338, 133], [2, 0.231, 0.2498, 138], [2, 0.247, 0.2658, 141], [2, 0.263, 0.2818, 150], [2, 0.279, 0.2978, 151], [2, 0.295, 0.3138, 152], [2, 0.311, 0.3298, 156], [2, 0.327, 0.3457, 161], [2, 0.3429, 0.3617, 169], [2, 0.3589, 0.3777, 172], [2, 0.3749, 0.3937, 172], [2, 0.3909, 0.4097, 175], [2, 0.4069, 0.4257, 175], [2, 0.4229, 0.4417, 179], [2, 0.4389, 0.4577, 182], [2, 0.4549, 0.4737, 183], [2, 0.4709, 0.4897, 183], [2, 0.4869, 0.5057, 189], [2, 0.5029, 0.5217, 191], [2, 0.5189, 0.5377, 192], [2, 0.5349, 0.5536, 203], [2, 0.5508, 0.5696, 204], [2, 0.5668, 0.5856, 204], [2, 0.5828, 0.6016, 207], [2, 0.5988, 0.6176, 207], [2, 0.6148, 0.6336, 208], [2, 0.6308, 0.6496, 210], [2, 0.6468, 0.6656, 214], [2, 0.6628, 0.6816, 215], [2, 0.6788, 0.6976, 215], [2, 0.6948, 0.7136, 217], [2, 0.7108, 0.7296, 217]];
 function startBook(P, TOC, MEMO){
 const N = P.length, LAST = N - 1, NINT = N - 4;            // real pages: 0 front cover, 1..252 interior, 253 back cover
 const AR = 396 / 612;                                     // page aspect (5.5 x 8.5 in)
@@ -522,13 +536,14 @@ window.__initNotes = function(N){
   window.__notes = { open, close, href: () => href(parts()) };
 };
 </script><script>
-window.__initChanges = function(C, N){
+window.__initChanges = function(C, N, U){
   if (!N || !C || !C.length || document.getElementById('cpanel')) return;
   const $ = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
-  const KEY = 'gys-decisions-' + N.ver;
+  const KEY = 'gys-decisions';   // one store across versions: change ids are stable
+  try { if (!localStorage.getItem(KEY)) { const o = localStorage.getItem('gys-decisions-v18'); if (o) localStorage.setItem(KEY, o); } } catch (e) {}
   const wide = () => window.innerWidth >= 900 && window.innerWidth > window.innerHeight;
   const both = () => wide() && window.innerWidth >= 1280;
-  const grp = v => v === 'v16' ? 'v16' : (v === 'v17' || v === 'v18') ? 'v17' : 'old';
+  const grp = v => v === 'v16' ? 'v16' : (+v.slice(1) >= 17) ? 'v17' : 'old';
   const COL = { v16: '#a066e6', v17: '#45c552', old: '#e2b52a' };
   const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } };
   let S = load();
@@ -551,6 +566,24 @@ window.__initChanges = function(C, N){
   const cst = $('div', 'cstat'); cst.setAttribute('role', 'status');
   foot.appendChild(sendRow); foot.appendChild(tools); foot.appendChild(cst); P.appendChild(foot);
   document.body.appendChild(P);
+  // t97u: Updates tab (email history + progress)
+  const tabs = $('div', 'ctabs'); const tC = $('button', 'on', N.tabChanges || 'Changes'), tU = $('button', '', N.tabUpdates || 'Updates'); tabs.appendChild(tC); tabs.appendChild(tU);
+  P.insertBefore(tabs, cnt);
+  const uview = [];
+  if (U && U.entries) {
+    const cur = $('div', 'ucur', N.uCurrent.replace('{v}', U.current.version).replace('{t}', U.current.updated)); const ulst = $('ul', 'ulist');
+    P.insertBefore(cur, cnt); P.insertBefore(ulst, cnt); uview.push(cur, ulst);
+    const cls = s => /^done/i.test(s) ? 'done' : /progress/i.test(s) ? 'prog' : /clarif/i.test(s) ? 'clar' : 'recv';
+    if (!U.entries.length) ulst.appendChild($('li', 'cnone', N.uNone));
+    U.entries.forEach(e => { const li = $('li', 'uitem'); li.dataset.id = e.id;
+      const top = $('div', 'utop'); top.appendChild($('span', '', N.uReceived + ' ' + e.received + ' \u00b7 ' + e.from)); top.appendChild($('span', 'ust ' + cls(e.status), e.status)); li.appendChild(top);
+      li.appendChild($('div', 'usub', e.subject)); if (e.note) li.appendChild($('div', 'unote', e.note));
+      (e.changes || []).forEach(c => { const d = $('div', 'uch', c.text); (c.pages || []).forEach(p => { const a = $('a', '', N.uPages + p); a.onclick = ev => { ev.stopPropagation(); jump({ r: p + 2, rects: [] }); }; d.appendChild(a); }); li.appendChild(d); });
+      li.appendChild($('div', 'upub', N.uPublished + ': ' + (e.published || N.uNotYet))); ulst.appendChild(li); });
+  } else tabs.style.display = 'none';
+  const cview = [cnt, fv, fs, ul, foot];
+  const tab = u => { tU.classList.toggle('on', u); tC.classList.toggle('on', !u); cview.forEach(x => x.style.display = u ? 'none' : ''); uview.forEach(x => x.style.display = u ? '' : 'none'); };
+  tC.onclick = () => tab(false); tU.onclick = () => tab(true); tab(false);
   ['keydown', 'keyup', 'keypress'].forEach(ev => P.addEventListener(ev, e => { if (e.key !== 'Escape') e.stopPropagation(); }));
   P.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
   ['pointerdown', 'pointerup'].forEach(ev => P.addEventListener(ev, e => e.stopPropagation()));
@@ -661,13 +694,13 @@ window.__initChanges = function(C, N){
   xb.addEventListener('click', close);
   window.addEventListener('resize', () => { if (!P.classList.contains('open')) return; fit(); const d = wide(); if (d !== document.body.classList.contains('cdock')) { document.body.classList.toggle('cdock', d); window.dispatchEvent(new Event('resize')); } });
   draw(); decorate();
-  window.__changes = { open, close, build, isOpen: () => P.classList.contains('open'), both };
+  window.__changes = { open, close, build, tab, isOpen: () => P.classList.contains('open'), both };
 };
 </script>
 
 <script>
 (function(){
-const CFG = {"id": "d1eefb1824c1", "bin": "book.d1eefb1824c1.bin", "size": 17172762, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "N9GXcSHXZN8eSRrA", "check": "7Mi19M3qi3iuCElldC/uGjUXauo8Nw=="};
+const CFG = {"id": "69be0af121cf", "bin": "book.69be0af121cf.bin", "size": 17176840, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "xfqsY/+7W5s+j5go", "check": "dUn7iPMGoBvbi3D+sOfoaU3eL81c8Q=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
@@ -723,7 +756,7 @@ async function openBook(key){
   $('lock').remove();
   startBook(urls, hdr.toc, hdr.memo || []);
   if (hdr.ui && hdr.ui.notes && window.__initNotes) window.__initNotes(hdr.ui.notes);
-  if (hdr.ui && hdr.ui.changes && window.__initChanges) window.__initChanges(hdr.changes, hdr.ui.changes);
+  if (hdr.ui && hdr.ui.changes && window.__initChanges) window.__initChanges(hdr.changes, hdr.ui.changes, hdr.updates);
 }
 async function unlock(pw, remember){
   msg('Checking password…');
