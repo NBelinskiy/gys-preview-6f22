@@ -76,6 +76,31 @@ footer{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:8px 12px c
 #msg.err{color:#ff8a80}
 #bar{height:4px;background:#3a3c41;border-radius:2px;margin-top:8px;overflow:hidden;display:none}
 #bar i{display:block;height:100%;width:0;background:#d4a24c;transition:width .2s}
+#npanel{position:fixed;top:0;right:0;bottom:0;width:360px;z-index:45;display:flex;flex-direction:column;background:#232428;border-left:1px solid #3a3c41;box-shadow:-8px 0 24px rgba(0,0,0,.35);transform:translateX(105%);transition:transform .25s ease;color:#eee;-webkit-user-select:text;user-select:text}
+#npanel.open{transform:none}
+#npanel .nh{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #3a3c41;background:#1d1e21}
+#npanel .nh b{flex:1 1 auto;font-size:15px;letter-spacing:.02em}
+#npanel .nb{flex:1 1 auto;overflow:auto;padding:12px;-webkit-overflow-scrolling:touch}
+#npanel p.ni{margin:0 0 10px;color:#a9abb0;font-size:12.5px}
+#npanel label.np{display:flex;align-items:center;gap:6px;font-size:13px;color:#ccc;margin-bottom:8px}
+#npanel input.npg{flex:0 1 140px;font:16px/1.2 inherit;padding:5px 8px;border-radius:6px;border:1px solid #4b4e55;background:#1d1e21;color:#fff}
+#npanel textarea{width:100%;min-height:150px;resize:vertical;font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:9px 10px;border-radius:8px;border:1px solid #4b4e55;background:#1d1e21;color:#fff}
+#npanel .nbtns{display:flex;gap:8px;margin:10px 0 6px}
+#npanel .nbtns button{flex:1 1 auto;padding:9px;font-weight:600}
+#npanel .nbtns .nsend{background:#d4a24c;color:#111;border:0}
+#npanel .nhint{font-size:12px;color:#a9abb0;margin:4px 0 6px}
+#npanel .nstat{min-height:18px;font-size:12.5px;color:#9fd49f;margin-bottom:8px}
+#npanel .nstat.err{color:#ff8a80}
+#npanel .nsent{border-top:1px solid #3a3c41;padding-top:10px;margin-top:6px}
+#npanel .nsent .nst{display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px}
+#npanel .nsent .nst button{padding:3px 9px;font-size:12px;font-weight:400}
+#npanel .nsent ul{list-style:none;margin:0;padding:0}
+#npanel .nsent li{background:#2b2d31;border:1px solid #3a3c41;border-radius:6px;padding:7px 9px;margin-bottom:6px;font-size:12.5px;white-space:pre-wrap;word-break:break-word}
+#npanel .nsent li small{display:block;color:#a9abb0;margin-bottom:3px}
+#npanel .nsent .nnone{color:#a9abb0;font-size:12.5px}
+#nbtn.on{background:#d4a24c;color:#111}
+body.ndock #app{right:360px}
+@media (max-width:899px),(orientation:portrait){#npanel{width:min(92vw,380px);top:var(--nt,0);bottom:var(--nbm,0);border-radius:10px 0 0 10px}body.ndock #app{right:0}}
 </style></head>
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
@@ -385,8 +410,78 @@ window.__flip = { goTo, next, prev, state: () => ({ cur, spreadMode, W, H, busy 
 }
 </script>
 <script>
+window.__initNotes = function(N){
+  if (!N || document.getElementById('npanel')) return;
+  const $ = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
+  const KEY = 'gys-notes-sent';
+  const fmt = (t, o) => t.replace(/\{(\w+)\}/g, (m, k) => o[k] !== undefined ? o[k] : m);
+  const wide = () => window.innerWidth >= 900 && window.innerWidth > window.innerHeight;
+  // top-bar toggle
+  const btn = $('button'); btn.id = 'nbtn'; btn.innerHTML = '&#x1F4AC; '; btn.appendChild(document.createTextNode(N.btn)); btn.title = N.title; btn.setAttribute('aria-label', N.title);
+  const fs = document.getElementById('fs'); fs.parentNode.insertBefore(btn, fs);
+  // panel
+  const P = $('aside'); P.id = 'npanel'; P.setAttribute('aria-label', N.title);
+  const head = $('div', 'nh'); head.appendChild($('b', '', N.title)); const xb = $('button', 'nx'); xb.innerHTML = '&times;'; xb.setAttribute('aria-label', N.close); head.appendChild(xb); P.appendChild(head);
+  const body = $('div', 'nb'); P.appendChild(body);
+  body.appendChild($('p', 'ni', N.intro));
+  const lab = $('label', 'np'); lab.appendChild(document.createTextNode(N.pageLabel)); const pg = $('input', 'npg'); pg.type = 'text'; pg.autocomplete = 'off'; lab.appendChild(pg); body.appendChild(lab);
+  const ta = $('textarea'); ta.placeholder = N.placeholder; ta.rows = 6; body.appendChild(ta);
+  const bt = $('div', 'nbtns'); const sb = $('button', 'nsend', N.send); const cb = $('button', 'ncopy', N.copy); bt.appendChild(sb); bt.appendChild(cb); body.appendChild(bt);
+  body.appendChild($('div', 'nhint', N.hint));
+  const st = $('div', 'nstat'); st.setAttribute('role', 'status'); body.appendChild(st);
+  const sent = $('div', 'nsent'); const sh = $('div', 'nst'); sh.appendChild($('span', '', N.sentTitle)); const clr = $('button', '', N.clear); sh.appendChild(clr); sent.appendChild(sh);
+  const ul = $('ul'); sent.appendChild(ul); body.appendChild(sent);
+  document.body.appendChild(P);
+  // keys typed in the panel never reach the page-turn handler
+  ['keydown', 'keyup', 'keypress'].forEach(ev => P.addEventListener(ev, e => { if (e.key !== 'Escape') e.stopPropagation(); }));
+  P.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
+  ['pointerdown', 'pointerup'].forEach(ev => P.addEventListener(ev, e => e.stopPropagation()));
+  // page field follows the book until the user edits it
+  let edited = false; pg.addEventListener('input', () => { edited = true; });
+  const cur = () => { const t = (document.getElementById('count').textContent || '').split(' / ')[0].trim(); return t.replace(/^pp?\.\s*/, ''); };
+  const sync = () => { if (!edited) pg.value = cur(); };
+  new MutationObserver(sync).observe(document.getElementById('count'), { childList: true, characterData: true, subtree: true });
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return []; } };
+  const save = l => { try { localStorage.setItem(KEY, JSON.stringify(l.slice(-200))); } catch (e) {} };
+  function list(){
+    ul.innerHTML = ''; const l = load();
+    if (!l.length) { ul.appendChild($('li', 'nnone', N.none)); clr.disabled = true; return; }
+    clr.disabled = false;
+    l.slice().reverse().forEach(x => { const li = $('li'); li.appendChild($('small', '', new Date(x.t).toLocaleString() + ' \u00b7 p.' + x.p + ' \u00b7 ' + (N.sentVia[x.via] || x.via))); li.appendChild(document.createTextNode(x.note)); ul.appendChild(li); });
+  }
+  const parts = () => { const page = (pg.value || cur()).trim(), note = ta.value.replace(/\s+$/, ''); return { page, note, subject: fmt(N.subject, { ver: N.ver, page }), body: fmt(N.body, { ver: N.ver, page, note }) }; };
+  const href = x => 'mailto:' + N.email + '?subject=' + encodeURIComponent(x.subject) + '&body=' + encodeURIComponent(x.body);
+  const status = (t, err) => { st.textContent = t; st.className = 'nstat' + (err ? ' err' : ''); };
+  const record = (x, via) => { const l = load(); l.push({ t: Date.now(), p: x.page, note: x.note, via }); save(l); list(); };
+  sb.addEventListener('click', () => {
+    const x = parts(); if (!x.note.trim()) { status(N.empty, true); ta.focus(); return; }
+    const h = href(x); window.__lastMailto = h;
+    const a = document.createElement('a'); a.href = h; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove();
+    record(x, 'mail'); status(N.opening);
+  });
+  cb.addEventListener('click', async () => {
+    const x = parts(); if (!x.note.trim()) { status(N.empty, true); ta.focus(); return; }
+    const txt = 'To: ' + N.email + '\n' + 'Subject: ' + x.subject + '\n\n' + x.body.replace(/\r\n/g, '\n');
+    window.__lastCopy = txt; let ok = false;
+    try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) {
+      try { const t = document.createElement('textarea'); t.value = txt; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); ok = document.execCommand('copy'); t.remove(); } catch (e2) {}
+    }
+    if (ok) { record(x, 'copy'); status(N.copied); } else status(N.copyFail, true);
+  });
+  clr.addEventListener('click', () => { if (confirm(N.clearAsk)) { save([]); list(); } });
+  const fit = () => { const h = document.querySelector('header'), f = document.querySelector('footer'); document.documentElement.style.setProperty('--nt', (h ? h.getBoundingClientRect().bottom : 0) + 'px'); document.documentElement.style.setProperty('--nbm', (f ? window.innerHeight - f.getBoundingClientRect().top : 0) + 'px'); };
+  function open(){ fit(); sync(); P.classList.add('open'); btn.classList.add('on'); if (wide()) { document.body.classList.add('ndock'); window.dispatchEvent(new Event('resize')); } }
+  function close(){ P.classList.remove('open'); btn.classList.remove('on'); if (document.body.classList.contains('ndock')) { document.body.classList.remove('ndock'); window.dispatchEvent(new Event('resize')); } if (P.contains(document.activeElement)) document.activeElement.blur(); }
+  btn.addEventListener('click', () => P.classList.contains('open') ? close() : open());
+  xb.addEventListener('click', close);
+  window.addEventListener('resize', () => { if (!P.classList.contains('open')) return; fit(); const d = wide(); if (d !== document.body.classList.contains('ndock')) { document.body.classList.toggle('ndock', d); window.dispatchEvent(new Event('resize')); } });
+  list(); sync();
+  window.__notes = { open, close, href: () => href(parts()) };
+};
+</script>
+<script>
 (function(){
-const CFG = {"id": "be2546de8c8e", "bin": "book.be2546de8c8e.bin", "size": 17900849, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "IVIPkXlZqvdKhlZp", "check": "gX0TfTJzXG1bE8lbQ58rDnA+c3VS8w=="};
+const CFG = {"id": "7201e63346ce", "bin": "book.7201e63346ce.bin", "size": 17901863, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "rwXn7uPfrqPuEsCO", "check": "AlOxY/+YSXtuu0SWEF1dsK9r4nPrmQ=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
@@ -441,6 +536,7 @@ async function openBook(key){
   window.__decryptMs = Math.round(performance.now() - t0);
   $('lock').remove();
   startBook(urls, hdr.toc, hdr.memo || []);
+  if (hdr.ui && hdr.ui.notes && window.__initNotes) window.__initNotes(hdr.ui.notes);
 }
 async function unlock(pw, remember){
   msg('Checking password…');
