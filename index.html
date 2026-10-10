@@ -146,6 +146,7 @@ body.ndock #app{right:360px}
 #cpanel .qlist{list-style:none;margin:0;padding:6px 10px;overflow:auto;flex:1 1 auto}
 #cpanel .qitem{border:1px solid #3a3c41;border-radius:8px;padding:8px 10px;margin:0 0 10px;background:#232428}
 #cpanel .qitem.qdone{opacity:.6}
+#cpanel .qans{margin:4px 0;padding:5px 8px;border-radius:6px;background:#1f3b23;color:#cfeccf;line-height:1.35}
 #cpanel .qtext{margin:6px 0;line-height:1.4;color:#eee}
 #cpanel .qopts{display:flex;flex-wrap:wrap;gap:5px;padding:2px 0 0}
 #cpanel .qitem textarea{width:100%;margin-top:6px;font:16px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:6px 8px;border-radius:6px;border:1px solid #4b4e55;background:#1d1e21;color:#fff;resize:vertical;box-sizing:border-box}
@@ -171,7 +172,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 10, 2026 (v21 – changes highlighted). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 10, 2026 (v22 – changes highlighted). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -181,7 +182,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v21 (B&amp;W, 10.5 pt) · Oct 10, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v22 (B&amp;W, 10.5 pt) · Oct 10, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -600,7 +601,7 @@ window.__initChanges = function(C, N, U, Q){
   const qAns = q => { const a = A[q.id] || {}; return (a.o && a.o.length) || (a.t && a.t.trim()); };
   const qOpen = () => QS.filter(q => q.status !== 'answered' && !qAns(q)).length;
   const qSendRow = $('div', 'csend'), qstat = $('div', 'cstat');
-  function qLines(){ return QS.map((q, k) => { const a = A[q.id] || {}; const parts = []; if (a.o && a.o.length) parts.push(a.o.join('; ')); if (a.t && a.t.trim()) parts.push(a.t.trim().replace(/\r?\n/g, ' / '));
+  function qLines(){ return QS.map((q, k) => [q, k]).filter(([q]) => q.status !== 'answered').map(([q, k]) => { const a = A[q.id] || {}; const parts = []; if (a.o && a.o.length) parts.push(a.o.join('; ')); if (a.t && a.t.trim()) parts.push(a.t.trim().replace(/\r?\n/g, ' / '));
     return 'Q' + (k + 1) + ' (p.' + (q.pages || []).join(', p.') + '): ' + q.q + '\r\nAnswer: ' + (parts.length ? parts.join(' \u2013 ') : N.qNoAnswer); }); }
   function qBuild(){ const L = qLines(); const head = N.qBodyHead.replace('{ver}', N.ver); const tail = '\r\n\r\n' + N.qBodyTail.replace('{ver}', N.ver);
     const chunks = []; let cur = []; L.forEach(l => { if (cur.length && (cur.concat([l]).join('\r\n\r\n').length + head.length + tail.length + 20) > 1800) { chunks.push(cur); cur = []; } cur.push(l); }); if (cur.length) chunks.push(cur);
@@ -620,8 +621,9 @@ window.__initChanges = function(C, N, U, Q){
     P.insertBefore(qintro, cnt); P.insertBefore(qlst, cnt); P.appendChild(qfoot); qview.push(qintro, qlst, qfoot);
     QS.forEach((q, k) => { const li = $('li', 'qitem' + (q.status === 'answered' ? ' qdone' : '')); li.dataset.id = q.id; const a0 = A[q.id] || (A[q.id] = { o: [], t: '' });
       const top = $('div', 'utop'); top.appendChild($('b', '', 'Q' + (k + 1))); const sb = $('span', 'ust'); top.appendChild(sb); li.appendChild(top);
-      const mark = () => { const ans = q.status === 'answered' ? N.qClosed : qAns(q) ? N.qAnswered : N.qOpenLbl; sb.textContent = ans; sb.className = 'ust ' + (q.status === 'answered' || qAns(q) ? 'done' : 'clar'); };
+      const mark = () => { const ans = q.status === 'answered' ? N.qClosed : qAns(q) ? N.qAnswered : q.status === 'recommendation' ? N.qRecLbl : N.qOpenLbl; sb.textContent = ans; sb.className = 'ust ' + (q.status === 'answered' || qAns(q) ? 'done' : 'clar'); };
       li.appendChild($('div', 'qtext', q.q));
+      if (q.answer) li.appendChild($('div', 'qans', q.answer));
       const pl = $('div', 'uch'); (q.pages || []).forEach(p => { const a = $('a', '', N.uPages + p); a.onclick = ev => { ev.stopPropagation(); jump({ r: p + (N.pageOff === undefined ? 2 : N.pageOff), rects: [] }); }; pl.appendChild(a); }); li.appendChild(pl);
       if (q.options && q.options.length) { const ch = $('div', 'qopts'); q.options.forEach(o => { const b = $('button', 'chip' + (a0.o.includes(o) ? ' on' : ''), o);
         b.onclick = () => { const i = a0.o.indexOf(o); if (i >= 0) a0.o.splice(i, 1); else a0.o.push(o); b.classList.toggle('on', i < 0); qsave(); mark(); qCount(); qBtns(); }; ch.appendChild(b); }); li.appendChild(ch); }
@@ -754,7 +756,7 @@ window.__initChanges = function(C, N, U, Q){
 
 <script>
 (function(){
-const CFG = {"id": "7c619ccb653a", "bin": "book.7c619ccb653a.bin", "size": 17239851, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "fWaLQcHTdGgGydsX", "check": "mBUixRH6MuNhChTidbIfsOi3hzdPGQ=="};
+const CFG = {"id": "0e19efbcb23b", "bin": "book.0e19efbcb23b.bin", "size": 17355694, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "0kVzdMqS8MHW2lWw", "check": "HF0J3UgT21GRn7iHIHvId3SjAKUSNQ=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
