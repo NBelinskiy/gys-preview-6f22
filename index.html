@@ -136,13 +136,23 @@ body.ndock #app{right:360px}
 #cpanel .cstat{min-height:16px;font-size:12px;color:#9fd49f;margin-top:5px}#cpanel .cstat.err{color:#ff8a80}
 #cbtn.on{background:#d4a24c;color:#111}
 #cpanel .ctabs{display:flex;gap:0;border-bottom:1px solid #3a3c41;background:#1d1e21}
-#cpanel .ctabs button{flex:1 1 50%;border:0;border-radius:0;background:none;padding:8px;font-weight:600;color:#a9abb0;border-bottom:2px solid transparent}
+#cpanel .ctabs button{flex:1 1 33%;border:0;border-radius:0;background:none;padding:8px;font-weight:600;color:#a9abb0;border-bottom:2px solid transparent}
 #cpanel .ctabs button.on{color:#fff;border-bottom-color:#d4a24c}
 #cpanel .ucur{padding:9px 12px;font-size:13px;font-weight:600;color:#e8d3a6;border-bottom:1px solid #3a3c41}
 #cpanel .ulist{flex:1 1 auto;overflow:auto;list-style:none;margin:0;padding:0 10px 10px;-webkit-overflow-scrolling:touch}
 #cpanel .uitem{background:#2b2d31;border:1px solid #3a3c41;border-radius:6px;padding:8px 10px;margin:8px 0}
 #cpanel .uitem .utop{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#a9abb0}
 #cpanel .ust{margin-left:auto;font-size:11px;padding:1px 7px;border-radius:9px;background:#3a3c41;color:#ddd;white-space:nowrap}
+#cpanel .qlist{list-style:none;margin:0;padding:6px 10px;overflow:auto;flex:1 1 auto}
+#cpanel .qitem{border:1px solid #3a3c41;border-radius:8px;padding:8px 10px;margin:0 0 10px;background:#232428}
+#cpanel .qitem.qdone{opacity:.6}
+#cpanel .qtext{margin:6px 0;line-height:1.4;color:#eee}
+#cpanel .qopts{display:flex;flex-wrap:wrap;gap:5px;padding:2px 0 0}
+#cpanel .qitem textarea{width:100%;margin-top:6px;font:16px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:6px 8px;border-radius:6px;border:1px solid #4b4e55;background:#1d1e21;color:#fff;resize:vertical;box-sizing:border-box}
+#cpanel .qbadge{display:inline-block;min-width:18px;margin-left:5px;padding:0 5px;border-radius:9px;background:#c0392b;color:#fff;font-size:11px;line-height:18px}
+.qbanner{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--nt,56px) + 10px);z-index:60;background:#2b2210;border:1px solid #d4a24c;color:#ffe4a8;padding:8px 10px 8px 14px;border-radius:10px;font:14px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.5);max-width:92vw;display:flex;align-items:center;gap:6px}
+.qbanner .qbgo{background:#d4a24c;color:#1d1e21;border:0;border-radius:6px;padding:4px 10px;font-weight:700;cursor:pointer}
+.qbanner .qbx{background:none;border:0;color:#ffe4a8;font-size:20px;cursor:pointer;padding:0 4px}
 #cpanel .ust.done{background:#245c2a;color:#bff0bf}#cpanel .ust.prog{background:#5c4a1c;color:#ffe4a8}#cpanel .ust.clar{background:#6b2420;color:#ffd0cc}#cpanel .ust.recv{background:#24476b;color:#cfe4ff}
 #cpanel .usub{font-weight:600;font-size:12.5px;margin:4px 0 2px}
 #cpanel .unote{font-size:12px;font-style:italic;color:#cfd0d3;margin-bottom:4px;word-break:break-word}
@@ -536,7 +546,7 @@ window.__initNotes = function(N){
   window.__notes = { open, close, href: () => href(parts()) };
 };
 </script><script>
-window.__initChanges = function(C, N, U){
+window.__initChanges = function(C, N, U, Q){
   if (!N || !C || !C.length || document.getElementById('cpanel')) return;
   const $ = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
   const KEY = 'gys-decisions';   // one store across versions: change ids are stable
@@ -581,10 +591,53 @@ window.__initChanges = function(C, N, U){
       li.appendChild($('div', 'usub', e.subject)); if (e.note) li.appendChild($('div', 'unote', e.note));
       (e.changes || []).forEach(c => { const d = $('div', 'uch', c.text); (c.pages || []).forEach(p => { const a = $('a', '', N.uPages + p); a.onclick = ev => { ev.stopPropagation(); jump({ r: p + (N.pageOff === undefined ? 2 : N.pageOff), rects: [] }); }; d.appendChild(a); }); li.appendChild(d); });
       li.appendChild($('div', 'upub', N.uPublished + ': ' + (e.published || N.uNotYet))); ulst.appendChild(li); });
-  } else tabs.style.display = 'none';
+  } else if (!(Q && Q.questions && Q.questions.length)) tabs.style.display = 'none';
+  // v21 (Questions tab): open questions for the reviewers, replies kept in localStorage, sent by mailto
+  const qview = []; const tQ = $('button', 'qtab', N.tabQuestions || 'Questions'); const qBadge = $('span', 'qbadge');
+  const QK = 'gys-answers'; const qload = () => { try { return JSON.parse(localStorage.getItem(QK) || '{}'); } catch (e) { return {}; } };
+  let A = qload(); const qsave = () => { try { localStorage.setItem(QK, JSON.stringify(A)); } catch (e) {} };
+  const QS = (Q && Q.questions) || [];
+  const qAns = q => { const a = A[q.id] || {}; return (a.o && a.o.length) || (a.t && a.t.trim()); };
+  const qOpen = () => QS.filter(q => q.status !== 'answered' && !qAns(q)).length;
+  const qSendRow = $('div', 'csend'), qstat = $('div', 'cstat');
+  function qLines(){ return QS.map((q, k) => { const a = A[q.id] || {}; const parts = []; if (a.o && a.o.length) parts.push(a.o.join('; ')); if (a.t && a.t.trim()) parts.push(a.t.trim().replace(/\r?\n/g, ' / '));
+    return 'Q' + (k + 1) + ' (p.' + (q.pages || []).join(', p.') + '): ' + q.q + '\r\nAnswer: ' + (parts.length ? parts.join(' \u2013 ') : N.qNoAnswer); }); }
+  function qBuild(){ const L = qLines(); const head = N.qBodyHead.replace('{ver}', N.ver); const tail = '\r\n\r\n' + N.qBodyTail.replace('{ver}', N.ver);
+    const chunks = []; let cur = []; L.forEach(l => { if (cur.length && (cur.concat([l]).join('\r\n\r\n').length + head.length + tail.length + 20) > 1800) { chunks.push(cur); cur = []; } cur.push(l); }); if (cur.length) chunks.push(cur);
+    return chunks.map((c, k) => ({ subject: N.qSubject + (chunks.length > 1 ? ' (' + N.part + ' ' + (k + 1) + '/' + chunks.length + ')' : ''), body: head + (chunks.length > 1 ? ' (' + N.part + ' ' + (k + 1) + '/' + chunks.length + ')' : '') + '\r\n\r\n' + c.join('\r\n\r\n') + tail })); }
+  function qBtns(){ qSendRow.innerHTML = ''; const parts = qBuild(); window.__answerParts = parts; const any = QS.some(qAns);
+    parts.forEach((x, k) => { const b = $('button', 'cgo', parts.length > 1 ? N.qSendPart.replace('{i}', k + 1).replace('{n}', parts.length) : N.qSend); b.disabled = !any;
+      b.onclick = () => { const h = href(x); window.__lastAnswersMailto = h; const a = document.createElement('a'); a.href = h; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove(); b.classList.add('done'); qstat.textContent = N.opening; qstat.className = 'cstat'; };
+      qSendRow.appendChild(b); });
+    const cb = $('button', 'ccopy', N.copy); cb.onclick = async () => { const txt = 'To: ' + N.email + '\nSubject: ' + N.qSubject + '\n\n' + N.qBodyHead.replace('{ver}', N.ver) + '\n\n' + qLines().join('\n\n').replace(/\r\n/g, '\n') + '\n\n' + N.qBodyTail.replace('{ver}', N.ver) + '\n'; window.__lastAnswersCopy = txt; let ok = false;
+      try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { try { const t = document.createElement('textarea'); t.value = txt; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); ok = document.execCommand('copy'); t.remove(); } catch (e2) {} }
+      qstat.textContent = ok ? N.copied : N.copyFail; qstat.className = 'cstat' + (ok ? '' : ' err'); };
+    qSendRow.appendChild(cb); if (parts.length > 1) qSendRow.appendChild($('div', 'chint', N.splitHint)); }
+  function qCount(){ const n = qOpen(); qBadge.textContent = n ? String(n) : ''; qBadge.style.display = n ? '' : 'none'; return n; }
+  if (QS.length) {
+    tQ.appendChild(qBadge); tabs.appendChild(tQ);
+    const qintro = $('div', 'ucur', N.qIntro); const qlst = $('ul', 'qlist'); const qfoot = $('div', 'cfoot'); qfoot.appendChild(qSendRow); qfoot.appendChild(qstat);
+    P.insertBefore(qintro, cnt); P.insertBefore(qlst, cnt); P.appendChild(qfoot); qview.push(qintro, qlst, qfoot);
+    QS.forEach((q, k) => { const li = $('li', 'qitem' + (q.status === 'answered' ? ' qdone' : '')); li.dataset.id = q.id; const a0 = A[q.id] || (A[q.id] = { o: [], t: '' });
+      const top = $('div', 'utop'); top.appendChild($('b', '', 'Q' + (k + 1))); const sb = $('span', 'ust'); top.appendChild(sb); li.appendChild(top);
+      const mark = () => { const ans = q.status === 'answered' ? N.qClosed : qAns(q) ? N.qAnswered : N.qOpenLbl; sb.textContent = ans; sb.className = 'ust ' + (q.status === 'answered' || qAns(q) ? 'done' : 'clar'); };
+      li.appendChild($('div', 'qtext', q.q));
+      const pl = $('div', 'uch'); (q.pages || []).forEach(p => { const a = $('a', '', N.uPages + p); a.onclick = ev => { ev.stopPropagation(); jump({ r: p + (N.pageOff === undefined ? 2 : N.pageOff), rects: [] }); }; pl.appendChild(a); }); li.appendChild(pl);
+      if (q.options && q.options.length) { const ch = $('div', 'qopts'); q.options.forEach(o => { const b = $('button', 'chip' + (a0.o.includes(o) ? ' on' : ''), o);
+        b.onclick = () => { const i = a0.o.indexOf(o); if (i >= 0) a0.o.splice(i, 1); else a0.o.push(o); b.classList.toggle('on', i < 0); qsave(); mark(); qCount(); qBtns(); }; ch.appendChild(b); }); li.appendChild(ch); }
+      const ta = $('textarea'); ta.placeholder = N.qPlaceholder; ta.value = a0.t || ''; ta.rows = 2;
+      ta.addEventListener('input', () => { a0.t = ta.value; qsave(); mark(); qCount(); }); ta.addEventListener('blur', qBtns); li.appendChild(ta);
+      mark(); qlst.appendChild(li); });
+    qCount(); qBtns();
+  }
   const cview = [cnt, fv, fs, ul, foot];
-  const tab = u => { tU.classList.toggle('on', u); tC.classList.toggle('on', !u); cview.forEach(x => x.style.display = u ? 'none' : ''); uview.forEach(x => x.style.display = u ? '' : 'none'); };
-  tC.onclick = () => tab(false); tU.onclick = () => tab(true); tab(false);
+  const tab = u => { const w = u === 'q' ? 'q' : u ? 'u' : 'c'; tU.classList.toggle('on', w === 'u'); tC.classList.toggle('on', w === 'c'); tQ.classList.toggle('on', w === 'q');
+    cview.forEach(x => x.style.display = w === 'c' ? '' : 'none'); uview.forEach(x => x.style.display = w === 'u' ? '' : 'none'); qview.forEach(x => x.style.display = w === 'q' ? '' : 'none'); };
+  tC.onclick = () => tab(false); tU.onclick = () => tab(true); tQ.onclick = () => tab('q'); tab(false);
+  // unlock banner
+  if (QS.length && qOpen()) { const bn = $('div', 'qbanner'); const n = qOpen(); const bt = $('button', 'qbgo', N.qBannerGo); const bx = $('button', 'qbx'); bx.innerHTML = '&times;'; bx.setAttribute('aria-label', N.close);
+    bn.appendChild(document.createTextNode(N.qBanner.replace('{n}', n) + ' \u2013 ')); bn.appendChild(bt); bn.appendChild(bx); document.body.appendChild(bn);
+    bt.onclick = () => { bn.remove(); open(); tab('q'); }; bx.onclick = () => bn.remove(); ['pointerdown', 'pointerup'].forEach(ev => bn.addEventListener(ev, e => e.stopPropagation())); }
   ['keydown', 'keyup', 'keypress'].forEach(ev => P.addEventListener(ev, e => { if (e.key !== 'Escape') e.stopPropagation(); }));
   P.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } });
   ['pointerdown', 'pointerup'].forEach(ev => P.addEventListener(ev, e => e.stopPropagation()));
@@ -695,13 +748,13 @@ window.__initChanges = function(C, N, U){
   xb.addEventListener('click', close);
   window.addEventListener('resize', () => { if (!P.classList.contains('open')) return; fit(); const d = wide(); if (d !== document.body.classList.contains('cdock')) { document.body.classList.toggle('cdock', d); window.dispatchEvent(new Event('resize')); } });
   draw(); decorate();
-  window.__changes = { open, close, build, tab, isOpen: () => P.classList.contains('open'), both };
+  window.__changes = { open, close, build, tab, qBuild, qOpen, isOpen: () => P.classList.contains('open'), both };
 };
 </script>
 
 <script>
 (function(){
-const CFG = {"id": "c65579311f59", "bin": "book.c65579311f59.bin", "size": 17235568, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "OJXel23HfodnKDCT", "check": "R0Al3KzMSoeWdDNKGHcuiIzbYMzAUg=="};
+const CFG = {"id": "7c619ccb653a", "bin": "book.7c619ccb653a.bin", "size": 17239851, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "fWaLQcHTdGgGydsX", "check": "mBUixRH6MuNhChTidbIfsOi3hzdPGQ=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
@@ -757,7 +810,7 @@ async function openBook(key){
   $('lock').remove();
   startBook(urls, hdr.toc, hdr.memo || []);
   if (hdr.ui && hdr.ui.notes && window.__initNotes) window.__initNotes(hdr.ui.notes);
-  if (hdr.ui && hdr.ui.changes && window.__initChanges) window.__initChanges(hdr.changes, hdr.ui.changes, hdr.updates);
+  if (hdr.ui && hdr.ui.changes && window.__initChanges) window.__initChanges(hdr.changes, hdr.ui.changes, hdr.updates, hdr.questions);
 }
 async function unlock(pw, remember){
   msg('Checking password…');
