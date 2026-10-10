@@ -161,7 +161,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 9, 2026 (v20 – changes highlighted). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 10, 2026 (v21 – changes highlighted). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -171,7 +171,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v20 (B&amp;W, 10.5 pt) · Oct 9, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v21 (B&amp;W, 10.5 pt) · Oct 10, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -180,7 +180,7 @@ body.cdock #app{left:360px}
 <div id="stage"><div id="book"></div><div id="hint">Swipe, use ← → keys, or click a page edge to turn</div></div>
 <footer>
   <button class="nav" id="prev" aria-label="Previous">&#x2039;</button>
-  <input type="range" id="slider" min="0" max="217" value="0" aria-label="Jump to page">
+  <input type="range" id="slider" min="0" max="221" value="0" aria-label="Jump to page">
   <button class="nav" id="next" aria-label="Next">&#x203A;</button>
   <div id="count"></div>
 </footer>
@@ -701,7 +701,7 @@ window.__initChanges = function(C, N, U){
 
 <script>
 (function(){
-const CFG = {"id": "5618623ff782", "bin": "book.5618623ff782.bin", "size": 16961620, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "xe07WdrgBT2w6SCf", "check": "BWtofmPVGZvOzN90ftlwp3YNkkPz7w=="};
+const CFG = {"id": "c65579311f59", "bin": "book.c65579311f59.bin", "size": 17235568, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "OJXel23HfodnKDCT", "check": "R0Al3KzMSoeWdDNKGHcuiIzbYMzAUg=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
