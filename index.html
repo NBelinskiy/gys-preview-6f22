@@ -174,7 +174,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 12, 2026 (v42). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 12, 2026 (v43). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -548,7 +548,8 @@ window.__initNotes = function(N){
   list(); sync();
   window.__notes = { open, close, href: () => href(parts()) };
 };
-</script><style>
+</script><style>#cpanel .ptxt figure{flex:1;margin:0}#cpanel .ptxt .pt{font-size:13px;line-height:1.4;padding:8px;border:1px solid #555;border-radius:6px;white-space:pre-wrap}#cpanel .ptxt .pamber{background:rgba(255,184,51,.28);border-color:#f5a623}#cpanel .pgrp{font-size:12px;opacity:.75;margin:2px 0 4px}
+
 #cpanel .cdonewrap{list-style:none;margin:8px 0 4px}#cpanel .cdonesum{cursor:pointer;padding:8px 10px;border-radius:6px;background:#2c2e33;color:#bfe3bf;font-size:13px;font-weight:600}
 #cpanel .cdonelist,#cpanel .pdonelist{padding:6px 0 0;overflow:visible}
 #cpanel .cres{margin:4px 0 2px;padding:5px 7px;font-size:12px;line-height:1.35;color:#cfe9cf;background:rgba(80,170,80,.14);border-left:3px solid #5cb85c;border-radius:3px}
@@ -677,8 +678,10 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
     ['pointerdown', 'pointerup', 'keydown'].forEach(ev => lb.addEventListener(ev, e => { if (e.key === 'Escape') lbClose(); e.stopPropagation(); }));
     window.__propLightbox = (src, cap) => { lbi.src = src; lbi.alt = cap || ''; lb.classList.add('open'); };
     const pdraw = () => { plst.innerHTML = ''; const pdone = $('ul', 'plist pdonelist'); PR.forEach(pr => { const id = pr.id; const li = $('li', 'pitem citem ' + status(id)); li.dataset.id = id;
-      const top = $('div', 'ctop'); const d = $('i', 'cdot'); d.style.background = '#f5a623'; top.appendChild(d); top.appendChild($('b', 'cpg', (N.pItem || 'Proposal {n}').replace('{n}', pr.n))); top.appendChild($('span', 'cv', 'v34')); top.appendChild(badge(id)); if (hasC(id)) top.appendChild($('span', 'cbad cm', '\u{1F4AC}')); li.appendChild(top);
+      const top = $('div', 'ctop'); const d = $('i', 'cdot'); d.style.background = '#f5a623'; top.appendChild(d); top.appendChild($('b', 'cpg', pr.id)); top.appendChild($('span', 'cv', pr.v || 'v34')); top.appendChild(badge(id)); if (hasC(id)) top.appendChild($('span', 'cbad cm', '\u{1F4AC}')); li.appendChild(top);
       li.appendChild($('div', 'clab', pr.title));
+      if (pr.grp) li.appendChild($('div', 'pgrp', pr.grp + (pr.org ? ' \u00b7 ' + pr.org : '')));
+      if (pr.tb !== undefined) { const g = $('div', 'ppair ptxt'); [[pr.tb, N.pBefore, ''], [pr.ta, N.pAfter, ' pamber']].forEach(([t, l, c]) => { const f = $('figure'); f.appendChild($('div', 'pt' + c, t)); f.appendChild($('figcaption', '', l)); g.appendChild(f); }); li.appendChild(g); }
       pr.pairs.forEach(([bi, ai]) => { const g = $('div', 'ppair'); [[bi, N.pBefore], [ai, N.pAfter]].forEach(([k, t]) => { const f = $('figure'); const im = $('img'); im.src = PU[k]; im.alt = t + ' \u2013 ' + pr.title; im.loading = 'lazy';
         im.onclick = e => { e.stopPropagation(); window.__propLightbox(PU[k], t); }; f.appendChild(im); f.appendChild($('figcaption', '', t)); g.appendChild(f); }); li.appendChild(g); });
       li.appendChild($('div', 'cex ptext', pr.text)); if (RES[id]) li.appendChild($('div', 'cres', '\u2714 ' + RES[id]));
@@ -686,7 +689,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
       const row = $('div', 'cact'); const s0 = st(id);
       const ab = $('button', 'cap' + (s0.d === 'approve' ? ' on' : ''), N.approve), rb = $('button', 'crj' + (s0.d === 'reject' ? ' on' : ''), N.reject), kb = $('button', 'ccm' + (hasC(id) ? ' on' : ''), N.comment);
       row.appendChild(ab); row.appendChild(rb); row.appendChild(kb); li.appendChild(row);
-      const ta = $('textarea', 'cbox'); ta.placeholder = N.commentPh; ta.value = s0.c || ''; ta.rows = 2; ta.style.display = hasC(id) ? '' : 'none'; li.appendChild(ta);
+      const ta = $('textarea', 'cbox'); ta.placeholder = N.commentPh; ta.value = s0.c || ''; ta.rows = 2; ta.style.display = (hasC(id) || pr.q) ? '' : 'none'; if (pr.q) ta.placeholder = N.qAnswerPh || 'Your answer'; li.appendChild(ta);
       ab.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'approve' ? null : 'approve'); pdraw(); sendBtns(); };
       rb.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'reject' ? null : 'reject'); pdraw(); sendBtns(); };
       kb.onclick = e => { e.stopPropagation(); ta.style.display = ''; ta.focus(); }; ta.onclick = e => e.stopPropagation();
@@ -840,7 +843,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
 
 <script>
 (function(){
-const CFG = {"id": "2bf5204e1b17", "bin": "book.2bf5204e1b17.bin", "size": 23959545, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "EQSyB7cM1MeEF5J9", "check": "j+kQjgwBrNHMcPYrinzeZ1HjLQ7JLQ=="};
+const CFG = {"id": "3fa3fc23aa31", "bin": "book.3fa3fc23aa31.bin", "size": 24011410, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "ip2U1W/drduuPmgo", "check": "DM7Ru/hKShte/pFkR1zp3TL4CjFOfg=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
