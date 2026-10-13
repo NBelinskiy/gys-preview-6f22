@@ -174,7 +174,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 12, 2026 (v38 – changes highlighted). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 12, 2026 (v39 – changes highlighted). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -184,7 +184,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v38 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v39 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -549,6 +549,8 @@ window.__initNotes = function(N){
   window.__notes = { open, close, href: () => href(parts()) };
 };
 </script><style>
+#cpanel .cdonewrap{list-style:none;margin:8px 0 4px}#cpanel .cdonesum{cursor:pointer;padding:8px 10px;border-radius:6px;background:#2c2e33;color:#bfe3bf;font-size:13px;font-weight:600}
+#cpanel .cdonelist,#cpanel .pdonelist{padding:6px 0 0;overflow:visible}
 #cpanel .cres{margin:4px 0 2px;padding:5px 7px;font-size:12px;line-height:1.35;color:#cfe9cf;background:rgba(80,170,80,.14);border-left:3px solid #5cb85c;border-radius:3px}
 .ctabs .ptab{white-space:nowrap}
 .plist{list-style:none;margin:0;padding:0 10px 10px;overflow:auto;flex:1 1 auto;min-height:0;-webkit-overflow-scrolling:touch}
@@ -674,12 +676,12 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
     const lbClose = () => lb.classList.remove('open'); lbx.onclick = e => { e.stopPropagation(); lbClose(); }; lb.onclick = e => { if (e.target === lb || e.target === lbc) lbClose(); };
     ['pointerdown', 'pointerup', 'keydown'].forEach(ev => lb.addEventListener(ev, e => { if (e.key === 'Escape') lbClose(); e.stopPropagation(); }));
     window.__propLightbox = (src, cap) => { lbi.src = src; lbi.alt = cap || ''; lb.classList.add('open'); };
-    const pdraw = () => { plst.innerHTML = ''; PR.forEach(pr => { const id = pr.id; const li = $('li', 'pitem citem ' + status(id)); li.dataset.id = id;
+    const pdraw = () => { plst.innerHTML = ''; const pdone = $('ul', 'plist pdonelist'); PR.forEach(pr => { const id = pr.id; const li = $('li', 'pitem citem ' + status(id)); li.dataset.id = id;
       const top = $('div', 'ctop'); const d = $('i', 'cdot'); d.style.background = '#f5a623'; top.appendChild(d); top.appendChild($('b', 'cpg', (N.pItem || 'Proposal {n}').replace('{n}', pr.n))); top.appendChild($('span', 'cv', 'v34')); top.appendChild(badge(id)); if (hasC(id)) top.appendChild($('span', 'cbad cm', '\u{1F4AC}')); li.appendChild(top);
       li.appendChild($('div', 'clab', pr.title));
       pr.pairs.forEach(([bi, ai]) => { const g = $('div', 'ppair'); [[bi, N.pBefore], [ai, N.pAfter]].forEach(([k, t]) => { const f = $('figure'); const im = $('img'); im.src = PU[k]; im.alt = t + ' \u2013 ' + pr.title; im.loading = 'lazy';
         im.onclick = e => { e.stopPropagation(); window.__propLightbox(PU[k], t); }; f.appendChild(im); f.appendChild($('figcaption', '', t)); g.appendChild(f); }); li.appendChild(g); });
-      li.appendChild($('div', 'cex ptext', pr.text));
+      li.appendChild($('div', 'cex ptext', pr.text)); if (RES[id]) li.appendChild($('div', 'cres', '\u2714 ' + RES[id]));
       const jl = $('a', 'pjump', (N.pJump || 'Go to p.{p}').replace('{p}', pr.p)); jl.onclick = e => { e.stopPropagation(); jump({ r: pr.p + (N.pageOff === undefined ? 2 : N.pageOff), rects: [] }); }; li.appendChild(jl);
       const row = $('div', 'cact'); const s0 = st(id);
       const ab = $('button', 'cap' + (s0.d === 'approve' ? ' on' : ''), N.approve), rb = $('button', 'crj' + (s0.d === 'reject' ? ' on' : ''), N.reject), kb = $('button', 'ccm' + (hasC(id) ? ' on' : ''), N.comment);
@@ -689,7 +691,9 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
       rb.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'reject' ? null : 'reject'); pdraw(); sendBtns(); };
       kb.onclick = e => { e.stopPropagation(); ta.style.display = ''; ta.focus(); }; ta.onclick = e => e.stopPropagation();
       ta.addEventListener('input', () => { set(id, 'c', ta.value); sendBtns(); }); ta.addEventListener('change', () => { kb.classList.toggle('on', hasC(id)); sendBtns(); });
-      plst.appendChild(li); }); };
+      ((pr.done || status(id) === 'approved') ? pdone : plst).appendChild(li); });
+      if (pdone.childNodes.length) { const w = $('li', 'cdonewrap'); const dt = $('details'); if (pdraw.open) dt.open = true; dt.addEventListener('toggle', () => { pdraw.open = dt.open; }); dt.appendChild($('summary', 'cdonesum', (N.pDoneTitle || 'Done – approved and applied ({n})').replace('{n}', pdone.childNodes.length))); dt.appendChild(pdone); w.appendChild(dt); plst.appendChild(w); }
+      if (!plst.querySelector(':scope > li.pitem')) plst.insertBefore($('li', 'cnone', N.pNone || 'Nothing waiting for a decision.'), plst.firstChild); };
     const pfoot = $('div', 'cfoot pfoot'); const pnote = $('div', 'chint', N.pSendHint || ''); const ptools = $('div', 'ctools'); const pCopy = $('button', 'ccopy pcopy', N.pCopy || 'Copy'); const pExp = $('button', 'pexp', N.pExport || 'Export .txt'); ptools.appendChild(pCopy); ptools.appendChild(pExp);
     pfoot.appendChild(psendRow); pfoot.appendChild(ptools); pfoot.appendChild(pnote); pfoot.appendChild(pcst);
     const pmsg = (t, e) => { pcst.textContent = t; pcst.className = 'cstat' + (e ? ' err' : ''); };
@@ -738,9 +742,9 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
   function badge(id){ const s = status(id); const b = $('span', 'cbad ' + s, s === 'approved' ? N.bApproved : s === 'rejected' ? N.bRejected : N.bPending); return b; }
   function set(id, k, v){ const o = Object.assign({}, st(id)); o[k] = v; o.t = Date.now(); delete o.pre; if (!o.d && !(o.c && o.c.trim()) && !DEF[id]) delete S[id]; else S[id] = o; save(); counts(); decorate(); sendBtns(); }
   function draw(){
-    chips(); counts(); ul.innerHTML = ''; let n = 0;
+    chips(); counts(); ul.innerHTML = ''; let n = 0; const doneUl = $('ul', 'clist cdonelist');
     C.forEach(c => {
-      if (!show(c)) return; n++;
+      if (!show(c)) return; n++; const tgt = (sOn === 'all' && status(c.id) === 'approved') ? doneUl : ul;
       const li = $('li', 'citem ' + status(c.id)); li.dataset.id = c.id;
       const top = $('div', 'ctop'); const d = $('i', 'cdot'); d.style.background = COL[grp(c.v)]; top.appendChild(d);
       top.appendChild($('b', 'cpg', 'p.' + c.p)); top.appendChild($('span', 'cv', c.v)); top.appendChild(badge(c.id)); if (hasC(c.id)) top.appendChild($('span', 'cbad cm', '\u{1F4AC}'));
@@ -756,8 +760,9 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
       ta.addEventListener('input', () => set(c.id, 'c', ta.value));
       ta.addEventListener('change', () => { kb.classList.toggle('on', hasC(c.id)); sendBtns(); });
       li.addEventListener('click', () => jump(c));
-      ul.appendChild(li);
+      tgt.appendChild(li);
     });
+    if (doneUl.childNodes.length) { const w = $('li', 'cdonewrap'); const dt = $('details'); if (draw.doneOpen) dt.open = true; dt.addEventListener('toggle', () => { draw.doneOpen = dt.open; }); dt.appendChild($('summary', 'cdonesum', (N.doneTitle || 'Done – approved ({n})').replace('{n}', doneUl.childNodes.length))); dt.appendChild(doneUl); w.appendChild(dt); ul.appendChild(w); }
     if (!n) ul.appendChild($('li', 'cnone', N.none));
     sendBtns();
   }
@@ -835,7 +840,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
 
 <script>
 (function(){
-const CFG = {"id": "eb82633ed512", "bin": "book.eb82633ed512.bin", "size": 21799711, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "Ibc/nB8yJPyn4Nke", "check": "BfEwiHUXTB2FmDlN8uB/GnelmV9Qog=="};
+const CFG = {"id": "823890388e57", "bin": "book.823890388e57.bin", "size": 21976079, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "Gi9kr+CwqIsUju6z", "check": "U/LS++sqz1iyJ3tGqt/QyBEBeq0Rug=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
