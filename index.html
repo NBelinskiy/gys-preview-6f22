@@ -174,7 +174,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 12, 2026 (v36 – changes highlighted). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 12, 2026 (v37 – changes highlighted). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -184,7 +184,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v36 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v37 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -550,7 +550,9 @@ window.__initNotes = function(N){
 };
 </script><style>
 .ctabs .ptab{white-space:nowrap}
-.plist{list-style:none;margin:0;padding:0 10px 10px;overflow:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch}
+.plist{list-style:none;margin:0;padding:0 10px 10px;overflow:auto;flex:1 1 auto;min-height:0;-webkit-overflow-scrolling:touch}
+#cpanel .pfoot{flex:0 0 auto;padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+#cpanel .pfoot .chint{font-size:11.5px;color:#aaa;margin-top:4px}
 .pitem{cursor:default}
 .ppair{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0}
 .ppair figure{margin:0}
@@ -660,6 +662,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
     qCount(); qBtns();
   }
   // v34: Proposals tab (before | proposed spread images, decisions share the Changes store and email)
+  const psendRow = $('div', 'csend'); const pcst = $('div', 'cstat'); pcst.setAttribute('role', 'status');
   const pview = []; const tP = $('button', 'ptab', N.tabProps || 'Proposals');
   if (PR.length) {
     tabs.appendChild(tP); tabs.style.display = '';
@@ -679,12 +682,13 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
       const ab = $('button', 'cap' + (s0.d === 'approve' ? ' on' : ''), N.approve), rb = $('button', 'crj' + (s0.d === 'reject' ? ' on' : ''), N.reject), kb = $('button', 'ccm' + (hasC(id) ? ' on' : ''), N.comment);
       row.appendChild(ab); row.appendChild(rb); row.appendChild(kb); li.appendChild(row);
       const ta = $('textarea', 'cbox'); ta.placeholder = N.commentPh; ta.value = s0.c || ''; ta.rows = 2; ta.style.display = hasC(id) ? '' : 'none'; li.appendChild(ta);
-      ab.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'approve' ? null : 'approve'); pdraw(); };
-      rb.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'reject' ? null : 'reject'); pdraw(); };
+      ab.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'approve' ? null : 'approve'); pdraw(); sendBtns(); };
+      rb.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'reject' ? null : 'reject'); pdraw(); sendBtns(); };
       kb.onclick = e => { e.stopPropagation(); ta.style.display = ''; ta.focus(); }; ta.onclick = e => e.stopPropagation();
-      ta.addEventListener('input', () => set(id, 'c', ta.value)); ta.addEventListener('change', () => pdraw());
+      ta.addEventListener('input', () => { set(id, 'c', ta.value); sendBtns(); }); ta.addEventListener('change', () => { pdraw(); sendBtns(); });
       plst.appendChild(li); }); };
-    window.__pdraw = pdraw;
+    const pfoot = $('div', 'cfoot pfoot'); const pnote = $('div', 'chint', N.pSendHint || ''); pfoot.appendChild(psendRow); pfoot.appendChild(pnote); pfoot.appendChild(pcst); P.insertBefore(pfoot, cnt); pview.push(pfoot);
+    window.__pdraw = () => { pdraw(); sendBtns(); };
   }
   const PRL = PR.map(pr => ({ id: pr.id, p: pr.p, l: 'Proposal ' + pr.n + ' (v34): ' + pr.title }));
   const cview = [cnt, fv, fs, ul, foot];
@@ -767,7 +771,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
   }
   new MutationObserver(() => { if (!decorate.busy) { decorate.busy = true; requestAnimationFrame(() => { decorate(); decorate.busy = false; }); } }).observe(document.getElementById('book'), { childList: true, subtree: false });
   // decisions email
-  const lines = () => C.concat(PRL).filter(c => st(c.id).d || hasC(c.id)).map(c => { const s = st(c.id);
+  const lines = () => PRL.concat(C).filter(c => st(c.id).d || hasC(c.id)).map(c => { const s = st(c.id);
     return '[' + c.id + '] p.' + c.p + ' \u2013 ' + c.l + '\r\n  Decision: ' + (s.d === 'approve' ? N.dApprove : s.d === 'reject' ? N.dReject : N.dNone) + (hasC(c.id) ? '\r\n  Comment: ' + s.c.trim().replace(/\r?\n/g, ' / ') : ''); });
   const LIM = 1800;
   function build(){
@@ -781,14 +785,15 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
   }
   const href = x => 'mailto:' + N.email + '?subject=' + encodeURIComponent(x.subject) + '&body=' + encodeURIComponent(x.body);
   const msg = (t, err) => { cst.textContent = t; cst.className = 'cstat' + (err ? ' err' : ''); };
-  function sendBtns(){
-    sendRow.innerHTML = ''; const parts = build(); window.__decisionParts = parts;
+  function sendBtns1(sendRow, msg){
+    const parts = build(); window.__decisionParts = parts; const sig = JSON.stringify(parts); if (sendRow.__sig === sig && sendRow.childNodes.length) return; sendRow.__sig = sig; sendRow.innerHTML = '';
     if (!parts.length) { const b = $('button', 'cgo', N.send); b.disabled = true; sendRow.appendChild(b); return; }
     parts.forEach((x, k) => { const b = $('button', 'cgo', parts.length > 1 ? N.sendPart.replace('{i}', k + 1).replace('{n}', parts.length) : N.send);
       b.onclick = () => { const h = href(x); window.__lastDecisionsMailto = h; const a = document.createElement('a'); a.href = h; a.style.display = 'none'; document.body.appendChild(a); a.click(); a.remove(); b.classList.add('done'); msg(N.opening); };
       sendRow.appendChild(b); });
     if (parts.length > 1) sendRow.appendChild($('div', 'chint', N.splitHint));
-  }
+  }  function sendBtns(){ sendBtns1(sendRow, msg); if (typeof psendRow !== 'undefined') sendBtns1(psendRow, (t, e) => { pcst.textContent = t; pcst.className = 'cstat' + (e ? ' err' : ''); }); }
+
   const fullText = () => { const L = lines(); return 'To: ' + N.email + '\nSubject: ' + N.subject + '\n\n' + N.bodyHead.replace('{ver}', N.ver).replace('{n}', String(L.length)) + '\n\n' + L.join('\n\n').replace(/\r\n/g, '\n') + '\n\n' + N.bodyTail.replace('{ver}', N.ver) + '\n'; };
   copyB.onclick = async () => { if (!lines().length) { msg(N.nothing, true); return; } const txt = fullText(); window.__lastDecisionsCopy = txt; let ok = false;
     try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) { try { const t = document.createElement('textarea'); t.value = txt; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); ok = document.execCommand('copy'); t.remove(); } catch (e2) {} }
@@ -811,7 +816,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
 
 <script>
 (function(){
-const CFG = {"id": "ba7da1ae5f8c", "bin": "book.ba7da1ae5f8c.bin", "size": 21791432, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "Uiq7nt0fuoqC3hEZ", "check": "qdyGeaNDvKZpIemR8MiJ1T9Ya+qpfw=="};
+const CFG = {"id": "32039756c73d", "bin": "book.32039756c73d.bin", "size": 21792097, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "JNQ8d/n3/QAUbcxM", "check": "07/J36B0/s3VLNaslns1p9pYIPsneA=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
