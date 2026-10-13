@@ -174,7 +174,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 12, 2026 (v33 – changes highlighted). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 12, 2026 (v34 – proposals for review). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -184,7 +184,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v33 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v34 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -193,7 +193,7 @@ body.cdock #app{left:360px}
 <div id="stage"><div id="book"></div><div id="hint">Swipe, use ← → keys, or click a page edge to turn</div></div>
 <footer>
   <button class="nav" id="prev" aria-label="Previous">&#x2039;</button>
-  <input type="range" id="slider" min="0" max="229" value="0" aria-label="Jump to page">
+  <input type="range" id="slider" min="0" max="255" value="0" aria-label="Jump to page">
   <button class="nav" id="next" aria-label="Next">&#x203A;</button>
   <div id="count"></div>
 </footer>
@@ -548,8 +548,26 @@ window.__initNotes = function(N){
   list(); sync();
   window.__notes = { open, close, href: () => href(parts()) };
 };
-</script><script>
-window.__initChanges = function(C, N, U, Q){
+</script><style>
+.ctabs .ptab{white-space:nowrap}
+.plist{list-style:none;margin:0;padding:0 10px 10px;overflow:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch}
+.pitem{cursor:default}
+.ppair{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0}
+.ppair figure{margin:0}
+.ppair img{width:100%;height:auto;display:block;border:1px solid #ccc;border-radius:3px;cursor:zoom-in;background:#fff;touch-action:manipulation}
+.ppair figcaption{font-size:11px;color:#666;text-align:center;margin-top:2px}
+.ptext{white-space:pre-wrap}
+.pjump{display:inline-block;margin:4px 0 2px;font-size:13px;color:#1a6fd1;cursor:pointer;text-decoration:underline;padding:4px 0}
+.plb{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:10000;display:none}
+.plb.open{display:block}
+.plbc{position:absolute;inset:44px 0 0 0;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y pinch-zoom;display:flex;align-items:flex-start;justify-content:center}
+.plbc img{max-width:none;width:min(1600px,200vw);height:auto;background:#fff}
+@media (orientation:landscape) and (min-width:900px){.plbc img{width:min(1600px,96vw)}}
+.plbx{position:absolute;top:6px;right:10px;width:36px;height:36px;font-size:26px;line-height:30px;border:0;border-radius:18px;background:#fff;color:#000;cursor:pointer}
+</style>
+<script>
+window.__initChanges = function(C, N, U, Q, PR, PU){
+  PR = PR || []; PU = PU || [];
   if (!N || !C || !C.length || document.getElementById('cpanel')) return;
   const $ = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x !== undefined) e.textContent = x; return e; };
   const KEY = 'gys-decisions';   // one store across versions: change ids are stable
@@ -636,10 +654,38 @@ window.__initChanges = function(C, N, U, Q){
       mark(); (q.status === 'answered' ? qplst : qlst).appendChild(li); });
     qCount(); qBtns();
   }
+  // v34: Proposals tab (before | proposed spread images, decisions share the Changes store and email)
+  const pview = []; const tP = $('button', 'ptab', N.tabProps || 'Proposals');
+  if (PR.length) {
+    tabs.appendChild(tP); tabs.style.display = '';
+    const pintro = $('div', 'ucur', N.pIntro); const plst = $('ul', 'plist'); P.insertBefore(pintro, cnt); P.insertBefore(plst, cnt); pview.push(pintro, plst);
+    const lb = $('div', 'plb'); const lbi = $('img'); const lbx = $('button', 'plbx'); lbx.innerHTML = '&times;'; lbx.setAttribute('aria-label', N.pClose); const lbc = $('div', 'plbc'); lbc.appendChild(lbi); lb.appendChild(lbc); lb.appendChild(lbx); document.body.appendChild(lb);
+    const lbClose = () => lb.classList.remove('open'); lbx.onclick = e => { e.stopPropagation(); lbClose(); }; lb.onclick = e => { if (e.target === lb || e.target === lbc) lbClose(); };
+    ['pointerdown', 'pointerup', 'keydown'].forEach(ev => lb.addEventListener(ev, e => { if (e.key === 'Escape') lbClose(); e.stopPropagation(); }));
+    window.__propLightbox = (src, cap) => { lbi.src = src; lbi.alt = cap || ''; lb.classList.add('open'); };
+    const pdraw = () => { plst.innerHTML = ''; PR.forEach(pr => { const id = pr.id; const li = $('li', 'pitem citem ' + status(id)); li.dataset.id = id;
+      const top = $('div', 'ctop'); const d = $('i', 'cdot'); d.style.background = '#f5a623'; top.appendChild(d); top.appendChild($('b', 'cpg', (N.pItem || 'Proposal {n}').replace('{n}', pr.n))); top.appendChild($('span', 'cv', 'v34')); top.appendChild(badge(id)); if (hasC(id)) top.appendChild($('span', 'cbad cm', '\u{1F4AC}')); li.appendChild(top);
+      li.appendChild($('div', 'clab', pr.title));
+      pr.pairs.forEach(([bi, ai]) => { const g = $('div', 'ppair'); [[bi, N.pBefore], [ai, N.pAfter]].forEach(([k, t]) => { const f = $('figure'); const im = $('img'); im.src = PU[k]; im.alt = t + ' \u2013 ' + pr.title; im.loading = 'lazy';
+        im.onclick = e => { e.stopPropagation(); window.__propLightbox(PU[k], t); }; f.appendChild(im); f.appendChild($('figcaption', '', t)); g.appendChild(f); }); li.appendChild(g); });
+      li.appendChild($('div', 'cex ptext', pr.text));
+      const jl = $('a', 'pjump', (N.pJump || 'Go to p.{p}').replace('{p}', pr.p)); jl.onclick = e => { e.stopPropagation(); jump({ r: pr.p + (N.pageOff === undefined ? 2 : N.pageOff), rects: [] }); }; li.appendChild(jl);
+      const row = $('div', 'cact'); const s0 = st(id);
+      const ab = $('button', 'cap' + (s0.d === 'approve' ? ' on' : ''), N.approve), rb = $('button', 'crj' + (s0.d === 'reject' ? ' on' : ''), N.reject), kb = $('button', 'ccm' + (hasC(id) ? ' on' : ''), N.comment);
+      row.appendChild(ab); row.appendChild(rb); row.appendChild(kb); li.appendChild(row);
+      const ta = $('textarea', 'cbox'); ta.placeholder = N.commentPh; ta.value = s0.c || ''; ta.rows = 2; ta.style.display = hasC(id) ? '' : 'none'; li.appendChild(ta);
+      ab.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'approve' ? null : 'approve'); pdraw(); };
+      rb.onclick = e => { e.stopPropagation(); set(id, 'd', st(id).d === 'reject' ? null : 'reject'); pdraw(); };
+      kb.onclick = e => { e.stopPropagation(); ta.style.display = ''; ta.focus(); }; ta.onclick = e => e.stopPropagation();
+      ta.addEventListener('input', () => set(id, 'c', ta.value)); ta.addEventListener('change', () => pdraw());
+      plst.appendChild(li); }); };
+    window.__pdraw = pdraw;
+  }
+  const PRL = PR.map(pr => ({ id: pr.id, p: pr.p, l: 'Proposal ' + pr.n + ' (v34): ' + pr.title }));
   const cview = [cnt, fv, fs, ul, foot];
-  const tab = u => { const w = u === 'q' ? 'q' : u ? 'u' : 'c'; tU.classList.toggle('on', w === 'u'); tC.classList.toggle('on', w === 'c'); tQ.classList.toggle('on', w === 'q');
+  const tab = u => { const w = u === 'q' ? 'q' : u === 'p' ? 'p' : u ? 'u' : 'c'; tU.classList.toggle('on', w === 'u'); tC.classList.toggle('on', w === 'c'); tQ.classList.toggle('on', w === 'q'); tP.classList.toggle('on', w === 'p'); pview.forEach(x => x.style.display = w === 'p' ? '' : 'none'); if (w === 'p') { cview.slice(0, 4).forEach(x => x.style.display = 'none'); foot.style.display = ''; if (window.__pdraw) window.__pdraw(); }
     cview.forEach(x => x.style.display = w === 'c' ? '' : 'none'); uview.forEach(x => x.style.display = w === 'u' ? '' : 'none'); qview.forEach(x => x.style.display = w === 'q' ? '' : 'none'); };
-  tC.onclick = () => tab(false); tU.onclick = () => tab(true); tQ.onclick = () => tab('q'); tab(false);
+  tC.onclick = () => tab(false); tU.onclick = () => tab(true); tQ.onclick = () => tab('q'); tP.onclick = () => tab('p'); tab(false);
   // unlock banner
   if (QS.length && qOpen()) { const bn = $('div', 'qbanner'); const n = qOpen(); const bt = $('button', 'qbgo', N.qBannerGo); const bx = $('button', 'qbx'); bx.innerHTML = '&times;'; bx.setAttribute('aria-label', N.close);
     bn.appendChild(document.createTextNode(N.qBanner.replace('{n}', n) + ' \u2013 ')); bn.appendChild(bt); bn.appendChild(bx); document.body.appendChild(bn);
@@ -716,7 +762,7 @@ window.__initChanges = function(C, N, U, Q){
   }
   new MutationObserver(() => { if (!decorate.busy) { decorate.busy = true; requestAnimationFrame(() => { decorate(); decorate.busy = false; }); } }).observe(document.getElementById('book'), { childList: true, subtree: false });
   // decisions email
-  const lines = () => C.filter(c => st(c.id).d || hasC(c.id)).map(c => { const s = st(c.id);
+  const lines = () => C.concat(PRL).filter(c => st(c.id).d || hasC(c.id)).map(c => { const s = st(c.id);
     return '[' + c.id + '] p.' + c.p + ' \u2013 ' + c.l + '\r\n  Decision: ' + (s.d === 'approve' ? N.dApprove : s.d === 'reject' ? N.dReject : N.dNone) + (hasC(c.id) ? '\r\n  Comment: ' + s.c.trim().replace(/\r?\n/g, ' / ') : ''); });
   const LIM = 1800;
   function build(){
@@ -760,7 +806,7 @@ window.__initChanges = function(C, N, U, Q){
 
 <script>
 (function(){
-const CFG = {"id": "ef2cf407c181", "bin": "book.ef2cf407c181.bin", "size": 18355423, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "6KTsMZjLMK05Uixl", "check": "mO/OT3hmEX1VtDWx4w+HjavLvmDXXA=="};
+const CFG = {"id": "9b35fd325c96", "bin": "book.9b35fd325c96.bin", "size": 21838260, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "uduFH/+0RNaNawRv", "check": "9oXIcFMFSo8iQXpxsTIDBsANEEquTA=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
@@ -812,11 +858,13 @@ async function openBook(key){
   const hdr = JSON.parse(new TextDecoder().decode(plain.subarray(8, 8 + hl)));
   const base = 8 + hl;
   const urls = hdr.offs.map(([o, n]) => URL.createObjectURL(new Blob([plain.subarray(base + o, base + o + n)], { type: 'image/jpeg' })));
+  const pbase = base + (hdr.offs.length ? hdr.offs[hdr.offs.length - 1][0] + hdr.offs[hdr.offs.length - 1][1] : 0);
+  const purls = (hdr.poffs || []).map(([o, n]) => URL.createObjectURL(new Blob([plain.subarray(pbase + o, pbase + o + n)], { type: 'image/jpeg' })));
   window.__decryptMs = Math.round(performance.now() - t0);
   $('lock').remove();
   startBook(urls, hdr.toc, hdr.memo || []);
   if (hdr.ui && hdr.ui.notes && window.__initNotes) window.__initNotes(hdr.ui.notes);
-  if (hdr.ui && hdr.ui.changes && window.__initChanges) window.__initChanges(hdr.changes, hdr.ui.changes, hdr.updates, hdr.questions);
+  if (hdr.ui && hdr.ui.changes && window.__initChanges) window.__initChanges(hdr.changes, hdr.ui.changes, hdr.updates, hdr.questions, hdr.proposals, purls);
 }
 async function unlock(pw, remember){
   msg('Checking password…');
