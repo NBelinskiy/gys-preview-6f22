@@ -174,7 +174,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 12, 2026 (v41). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 12, 2026 (v42). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -184,7 +184,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v41 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v42 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -840,7 +840,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
 
 <script>
 (function(){
-const CFG = {"id": "568a26871a82", "bin": "book.568a26871a82.bin", "size": 23978440, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "h7vM49F+8qhH0deX", "check": "ej+dFQPO1PW3ia99QHaeAPRKp9F1og=="};
+const CFG = {"id": "2bf5204e1b17", "bin": "book.2bf5204e1b17.bin", "size": 23959545, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "EQSyB7cM1MeEF5J9", "check": "j+kQjgwBrNHMcPYrinzeZ1HjLQ7JLQ=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
