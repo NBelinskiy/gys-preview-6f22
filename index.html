@@ -174,7 +174,7 @@ body.cdock #app{left:360px}
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
   <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 12, 2026 (v40 – changes highlighted). Enter the password to open.</p>
+  <p>Private flipbook preview · Oct 12, 2026 (v41). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -184,7 +184,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v40 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v41 (B&amp;W, 10.5 pt) · Oct 12, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -193,7 +193,7 @@ body.cdock #app{left:360px}
 <div id="stage"><div id="book"></div><div id="hint">Swipe, use ← → keys, or click a page edge to turn</div></div>
 <footer>
   <button class="nav" id="prev" aria-label="Previous">&#x2039;</button>
-  <input type="range" id="slider" min="0" max="255" value="0" aria-label="Jump to page">
+  <input type="range" id="slider" min="0" max="283" value="0" aria-label="Jump to page">
   <button class="nav" id="next" aria-label="Next">&#x203A;</button>
   <div id="count"></div>
 </footer>
@@ -697,7 +697,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
     const pfoot = $('div', 'cfoot pfoot'); const pnote = $('div', 'chint', N.pSendHint || ''); const ptools = $('div', 'ctools'); const pCopy = $('button', 'ccopy pcopy', N.pCopy || 'Copy'); const pExp = $('button', 'pexp', N.pExport || 'Export .txt'); ptools.appendChild(pCopy); ptools.appendChild(pExp);
     pfoot.appendChild(psendRow); pfoot.appendChild(ptools); pfoot.appendChild(pnote); pfoot.appendChild(pcst);
     const pmsg = (t, e) => { pcst.textContent = t; pcst.className = 'cstat' + (e ? ' err' : ''); };
-    const ptxt = () => { const L = PR.map(pr => { const x = st(pr.id), sv = status(pr.id); return [pr.id, 'Page: p.' + pr.p, 'Title: Proposal ' + pr.n + ' \u2013 ' + pr.title, 'Status: ' + (sv === 'approved' ? 'APPROVED' : sv === 'rejected' ? 'REJECTED' : 'PENDING'), 'Comment: ' + ((x.c || '').trim().replace(/\r?\n/g, ' / ') || '\u2013')].join('\n'); });
+    const ptxt = () => { const L = PR.map(pr => { const x = st(pr.id), sv = status(pr.id); return [pr.id, 'Page: p.' + pr.p, 'Title: Proposal ' + pr.id + ' \u2013 ' + pr.title, 'Status: ' + (sv === 'approved' ? 'APPROVED' : sv === 'rejected' ? 'REJECTED' : 'PENDING'), 'Comment: ' + ((x.c || '').trim().replace(/\r?\n/g, ' / ') || '\u2013')].join('\n'); });
       return 'GYS proposals \u2013 decisions (' + N.ver + ')\n' + new Date().toLocaleString() + '\n' + PR.length + ' proposals\n\n' + L.join('\n\n') + '\n'; };
     pCopy.onclick = async () => { const t = ptxt(); window.__lastPropCopy = t; let ok = false;
       try { await navigator.clipboard.writeText(t); ok = true; } catch (e) { try { const x = document.createElement('textarea'); x.value = t; x.setAttribute('readonly', ''); x.style.position = 'fixed'; x.style.opacity = '0'; document.body.appendChild(x); x.select(); x.setSelectionRange(0, t.length); ok = document.execCommand('copy'); x.remove(); } catch (e2) {} }
@@ -710,7 +710,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
       const w = window.open(URL.createObjectURL(blob), '_blank'); pmsg(w ? (N.pOpened || 'Opened in a new tab: use Share to save it.') : (N.copyFail || 'Could not export.'), !w); }; P.insertBefore(pfoot, cnt); pview.push(pfoot);
     window.__pdraw = () => { pdraw(); sendBtns(); };
   }
-  const PRL = PR.map(pr => ({ id: pr.id, p: pr.p, l: 'Proposal ' + pr.n + ' (v34): ' + pr.title }));
+  const PRL = PR.map(pr => ({ id: pr.id, p: pr.p, l: 'Proposal ' + pr.id + ': ' + pr.title }));
   const cview = [cnt, fv, fs, ul, foot];
   const tab = u => { const w = u === 'q' ? 'q' : u === 'p' ? 'p' : u ? 'u' : 'c'; tU.classList.toggle('on', w === 'u'); tC.classList.toggle('on', w === 'c'); tQ.classList.toggle('on', w === 'q'); tP.classList.toggle('on', w === 'p'); pview.forEach(x => x.style.display = w === 'p' ? '' : 'none'); if (w === 'p') { cview.slice(0, 4).forEach(x => x.style.display = 'none'); foot.style.display = ''; if (window.__pdraw) window.__pdraw(); }
     cview.forEach(x => x.style.display = w === 'c' ? '' : 'none'); uview.forEach(x => x.style.display = w === 'u' ? '' : 'none'); qview.forEach(x => x.style.display = w === 'q' ? '' : 'none'); };
@@ -840,7 +840,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
 
 <script>
 (function(){
-const CFG = {"id": "d8a68328d951", "bin": "book.d8a68328d951.bin", "size": 21988472, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "VKszj3FpwP6ZKxdY", "check": "coNvpmkzHXgXKWSegwDyuna6klf2Kg=="};
+const CFG = {"id": "568a26871a82", "bin": "book.568a26871a82.bin", "size": 23978440, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "h7vM49F+8qhH0deX", "check": "ej+dFQPO1PW3ia99QHaeAPRKp9F1og=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
