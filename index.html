@@ -2,13 +2,14 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<meta name="googlebot" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="GYS Preview">
 <meta name="theme-color" content="#1d1e21">
 <meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
 <title>Private preview</title>
 <style>
 *{box-sizing:border-box}
@@ -173,8 +174,8 @@ body.cdock #app{left:360px}
 </style></head>
 <body>
 <div id="lock"><form id="lockform" autocomplete="on">
-  <h1>Private <span>Preview</span></h1>
-  <p>Private flipbook preview · Oct 23, 2026 (v68n). Enter the password to open.</p>
+  <h1>Grow Your <span>Superpowers</span></h1>
+  <p>Private flipbook preview · Oct 23, 2026 (v69). Enter the password to open.</p>
   <input type="text" name="username" value="GYS preview" autocomplete="username" style="display:none" aria-hidden="true">
   <input type="password" id="pw" name="password" placeholder="Password" autocomplete="current-password" autocapitalize="off" autocorrect="off" spellcheck="false" required>
   <label><input type="checkbox" id="remember" checked> Remember on this device</label>
@@ -184,7 +185,7 @@ body.cdock #app{left:360px}
 </form></div>
 <div id="app">
 <header>
-  <div class="ttl"><span class="full">Private preview</span><span class="short">GYS</span> <small>Full preview v68 (B&amp;W, 10.5 pt) · Oct 23, 2026 · screen only, not for print</small></div>
+  <div class="ttl"><span class="full">Grow Your Superpowers</span><span class="short">GYS</span> <small>Full preview v69 (B&amp;W, 10.5 pt) · Oct 23, 2026 · screen only, not for print</small></div>
   <select id="toc" aria-label="Table of contents"></select>
   <button id="fs" title="Fullscreen (F)" aria-label="Fullscreen">&#x26F6;</button>
   <button id="lockbtn" title="Lock and forget this device" aria-label="Lock">&#x1F512;</button>
@@ -193,7 +194,7 @@ body.cdock #app{left:360px}
 <div id="stage"><div id="book"></div><div id="hint">Swipe, use ← → keys, or click a page edge to turn</div></div>
 <footer>
   <button class="nav" id="prev" aria-label="Previous">&#x2039;</button>
-  <input type="range" id="slider" min="0" max="233" value="0" aria-label="Jump to page">
+  <input type="range" id="slider" min="0" max="235" value="0" aria-label="Jump to page">
   <button class="nav" id="next" aria-label="Next">&#x203A;</button>
   <div id="count"></div>
 </footer>
@@ -844,7 +845,7 @@ window.__initChanges = function(C, N, U, Q, PR, PU){
 
 <script>
 (function(){
-const CFG = {"id": "aeb7a16ebc92", "bin": "book.aeb7a16ebc92.bin", "size": 15406786, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "VISQ3oV2A5CW1EF1", "check": "JxwD2LfMWS+/JP2tDUUiPKqFBDgcXg=="};
+const CFG = {"id": "5c19677656a8", "bin": "book.5c19677656a8.bin", "size": 15158269, "iter": 600000, "salt": "Uiq5LfWXrZBZtuUOXXW7jg==", "ivc": "MeVCD09uVXcbP+ad", "check": "WTysplcqCYU0N0lOKVV2I54mpTBpcQ=="};
 const ub64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
 const b64 = u => { let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
 const SALT = ub64(CFG.salt), IVC = ub64(CFG.ivc), CHECK = ub64(CFG.check);
